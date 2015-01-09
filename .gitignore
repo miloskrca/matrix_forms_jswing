@@ -1,0 +1,13 @@
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# IDE files #
+.idea/*
+*.iml
+
+# Libraries #
+lib/*
