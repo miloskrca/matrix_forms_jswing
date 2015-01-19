@@ -23,7 +23,7 @@ public class LaTexPanel extends JPanel {
     public void setFormula(String formula) {
         TeXFormula teXFormula = new TeXFormula(formula);
         this.icon = teXFormula.createTeXIcon(
-                TeXConstants.STYLE_DISPLAY, 40);
+                TeXConstants.STYLE_DISPLAY, 20);
     }
 
     public void render() {
@@ -38,6 +38,6 @@ public class LaTexPanel extends JPanel {
         BufferedImage b = new BufferedImage(this.icon.getIconWidth(), this.icon
                 .getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         this.icon.paintIcon(new JLabel(), b.getGraphics(), 0, 0);
-
+        this.add(new JLabel(new ImageIcon(b)));
     }
 }

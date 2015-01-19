@@ -17,6 +17,8 @@ import rs.etf.km123247m.Parser.ParserTypes.StringParser;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,11 +54,8 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private JTextArea textMatrixInlineInput;
     private JButton btnStart;
     private JComboBox comboFormSelect;
-    private JSlider sliderSteps;
-    private JButton btnStepNext;
-    private JButton btnStepPrev;
-    private JTextPane textStepDescription;
     private JPanel panelMatrixDisplay;
+    private JList<String> listSteps;
 
     public MatrixFormsJSwing() {
         super("Matrix Forms JSwing");
@@ -92,30 +91,13 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                 }
             }
         });
-        sliderSteps.addChangeListener(new ChangeListener() {
+        listSteps.addListSelectionListener(new ListSelectionListener() {
             @Override
-            public void stateChanged(ChangeEvent e) {
+            public void valueChanged(ListSelectionEvent e) {
                 stepSelected();
-                System.out.println(sliderSteps.getValue());
+                System.out.println(listSteps.getSelectedIndex());
             }
         });
-        btnStepNext.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (sliderSteps.getValue() < sliderSteps.getMaximum()) {
-                    sliderSteps.setValue(sliderSteps.getValue() + 1);
-                }
-            }
-        });
-        btnStepPrev.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (sliderSteps.getValue() > sliderSteps.getMinimum()) {
-                    sliderSteps.setValue(sliderSteps.getValue() - 1);
-                }
-            }
-        });
-
 
         setContentPane(rootPanel);
         pack();
@@ -153,50 +135,55 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
             case FormEvent.PROCESSING_END:
                 step = getStep(AbstractStep.END, null, event, form);
                 stepObjects.add(step);
-                sliderSteps.setMaximum(stepObjects.size() - 1);
-                sliderSteps.setValue(sliderSteps.getMaximum());
+                listSteps.setSelectedIndex(stepObjects.size() - 1);
+                listSteps.setEnabled(true);
                 System.out.println("End");
+                DefaultListModel<String> listModel = new DefaultListModel<String>();
+                for(AbstractStep aStep : stepObjects) {
+                    listModel.addElement(aStep.getTitle());
+                }
+                listSteps.setModel(listModel);
                 break;
             case FormEvent.PROCESSING_EXCEPTION:
                 System.out.println(event.getMessage());
+                stepObjects.clear();
+                panelMatrixDisplay.removeAll();
+                panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
+                panelMatrixDisplay.add(getPanel("\\text{Exception: " + event.getMessage() + "}"));
+                panelMatrixDisplay.repaint();
+                listSteps.setEnabled(false);
                 break;
         }
     }
 
     private void stepSelected() {
         if (stepObjects.size() > 0) {
-            int selected = sliderSteps.getValue();
-            if(currentlySelectedStep == selected) {
+            int selected = listSteps.getSelectedIndex();
+            if(currentlySelectedStep == selected || currentlySelectedStep == -1) {
                 return;
             }
             currentlySelectedStep = selected;
             AbstractStep selectedStep;
 
             panelMatrixDisplay.removeAll();
-            panelMatrixDisplay.setLayout(new BorderLayout());
-            panelMatrixDisplay.revalidate();
+            panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
 
-            if (selected == -1) {
-                JPanel panel = getPanel("\\text{No steps selected.}");
-                panelMatrixDisplay.add(panel);
-            } else {
-                try {
-                    selectedStep = stepObjects.get(selected);
-                    ArrayList<LaTexPanel> panels = selectedStep.getPanels();
-                    for (LaTexPanel panel : panels) {
-                        panelMatrixDisplay.add(panel, BorderLayout.NORTH);
-                    }
-                    textStepDescription.setText(selectedStep.getTitle() + "\n" + selectedStep.getDescription());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    for (StackTraceElement s : e.getStackTrace()) {
-                        panelMatrixDisplay.add(new JLabel(s.toString()), BorderLayout.NORTH);
-                    }
+            try {
+                selectedStep = stepObjects.get(selected);
+                ArrayList<LaTexPanel> panels = selectedStep.getPanels();
+                panelMatrixDisplay.add(getPanel("\\text{" + selectedStep.getTitle() + "\n\n" + selectedStep.getDescription() + "}"));
+                for (LaTexPanel panel : panels) {
+                    panelMatrixDisplay.add(panel);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                for (StackTraceElement s : e.getStackTrace()) {
+                    panelMatrixDisplay.add(new JLabel(s.toString()), BorderLayout.NORTH);
                 }
             }
-        }
 
-        panelMatrixDisplay.repaint();
+            panelMatrixDisplay.repaint();
+        }
     }
 
     private AbstractStep getStep(int type, ICommand command, FormEvent event, MatrixForm form) {

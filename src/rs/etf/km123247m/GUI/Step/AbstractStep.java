@@ -36,7 +36,7 @@ public abstract class AbstractStep {
         try {
             saveMatricesForTheCurrentState();
         } catch (Exception e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
         }
     }
 
@@ -52,11 +52,11 @@ public abstract class AbstractStep {
     }
 
     public ArrayList<LaTexPanel> getPanels() throws Exception {
-        ArrayList<LaTexPanel> panes = new ArrayList<LaTexPanel>();
+        ArrayList<LaTexPanel> panels = new ArrayList<LaTexPanel>();
         for(Map.Entry<String, IMatrix> entry: matrices) {
-            panes.add(getPanel(generateLatexMatrix(entry.getKey(), entry.getValue())));
+            panels.add(getPanel(generateLatexMatrix(entry.getKey(), entry.getValue())));
         }
-        return panes;
+        return panels;
     }
 
     protected LaTexPanel getPanel(String formula) {
