@@ -19,7 +19,7 @@ public class RationalCanonicalStep extends AbstractStep {
     }
 
     @Override
-    protected void saveMatricesForTheCurrentState() throws Exception {
+    protected void saveStepStatusPanel() throws Exception {
         RationalCanonicalMatrixForm rForm = (RationalCanonicalMatrixForm) getForm();
         MatrixHandler handler = rForm.getHandler();
         switch (getNumber()) {
@@ -42,7 +42,6 @@ public class RationalCanonicalStep extends AbstractStep {
         }
     }
 
-    @Override
     public String getDescription() {
         String title = "\\begin{array}{l}";
         switch (getNumber()) {

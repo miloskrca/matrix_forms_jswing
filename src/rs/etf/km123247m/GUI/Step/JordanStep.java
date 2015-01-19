@@ -17,7 +17,7 @@ public class JordanStep extends AbstractStep {
     }
 
     @Override
-    protected void saveMatricesForTheCurrentState() throws Exception {
+    protected void saveStepStatusPanel() throws Exception {
         JordanMatrixForm jForm = (JordanMatrixForm) getForm();
         switch (getNumber()) {
             case START:
@@ -36,7 +36,6 @@ public class JordanStep extends AbstractStep {
         }
     }
 
-    @Override
     public String getDescription() {
         String title = "\\begin{array}{l}";
         switch (getNumber()) {

@@ -5,6 +5,7 @@ import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -13,11 +14,11 @@ import java.awt.image.BufferedImage;
  * <p/>
  * package: rs.etf.km123247m.Model
  */
-public class LaTexPanel extends JPanel {
+public class LaTexLabel extends JLabel {
     private TeXIcon icon;
 
-    public LaTexPanel() {
-
+    public LaTexLabel() {
+        setBackground(Color.RED);
     }
 
     public void setFormula(String formula) {
@@ -38,6 +39,6 @@ public class LaTexPanel extends JPanel {
         BufferedImage b = new BufferedImage(this.icon.getIconWidth(), this.icon
                 .getIconHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         this.icon.paintIcon(new JLabel(), b.getGraphics(), 0, 0);
-        this.add(new JLabel(new ImageIcon(b)));
+        this.setIcon(new ImageIcon(b));
     }
 }

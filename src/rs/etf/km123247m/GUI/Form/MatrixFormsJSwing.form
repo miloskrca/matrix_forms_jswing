@@ -78,9 +78,11 @@
             <properties/>
             <border type="none"/>
             <children>
-              <grid id="10451" binding="panelMatrixDisplay" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+              <grid id="10451" binding="panelMatrixDisplay" layout-manager="BorderLayout" hgap="0" vgap="0">
                 <constraints/>
-                <properties/>
+                <properties>
+                  <alignmentY value="0.5"/>
+                </properties>
                 <border type="none"/>
                 <children/>
               </grid>

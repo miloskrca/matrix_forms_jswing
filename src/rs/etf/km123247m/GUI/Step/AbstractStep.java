@@ -6,8 +6,8 @@ import rs.etf.km123247m.Matrix.Forms.MatrixForm;
 import rs.etf.km123247m.Matrix.IMatrix;
 import rs.etf.km123247m.Observer.Event.FormEvent;
 
+import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -27,45 +27,35 @@ public abstract class AbstractStep {
     private FormEvent event;
     private ICommand command;
     protected ArrayList<Map.Entry<String, IMatrix>> matrices = new ArrayList<Map.Entry<String, IMatrix>>();
+    protected JPanel stepStatusPanel = new JPanel();
 
     public AbstractStep(int number, ICommand command, FormEvent event, MatrixForm form) {
         this.number = number;
         this.command = command;
         this.event = event;
         this.form = form;
+
         try {
-            saveMatricesForTheCurrentState();
+            stepStatusPanel.setLayout(new BoxLayout(stepStatusPanel, BoxLayout.Y_AXIS));
+            saveStepStatusPanel();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    protected abstract void saveMatricesForTheCurrentState() throws Exception;
+    protected abstract void saveStepStatusPanel() throws Exception;
 
-    public String getMuPadCommands() throws Exception {
-        String mupadCommands = "";
-        for(Map.Entry<String, IMatrix> entry: matrices) {
-            mupadCommands += "\n" + generateMupadMatrix(entry.getKey(), entry.getValue());
-        }
+    public static LaTexLabel getLaTexPanel(String formula) {
+        LaTexLabel label = new LaTexLabel();
 
-        return mupadCommands;
+        label.setFormula(formula);
+        label.render();
+
+        return label;
     }
 
-    public ArrayList<LaTexPanel> getPanels() throws Exception {
-        ArrayList<LaTexPanel> panels = new ArrayList<LaTexPanel>();
-        for(Map.Entry<String, IMatrix> entry: matrices) {
-            panels.add(getPanel(generateLatexMatrix(entry.getKey(), entry.getValue())));
-        }
-        return panels;
-    }
-
-    protected LaTexPanel getPanel(String formula) {
-        LaTexPanel panel = new LaTexPanel();
-
-        panel.setFormula(formula);
-        panel.render();
-
-        return panel;
+    public JPanel getStepStatusPanel() {
+        return stepStatusPanel;
     }
 
     public String getTitle() {
@@ -80,8 +70,6 @@ public abstract class AbstractStep {
                 return "Step " + number;
         }
     }
-
-    public abstract String getDescription();
 
     protected String generateLatexMatrix(String name, IMatrix matrix) throws Exception {
         String f = name +" = \\begin{bmatrix}";
@@ -116,6 +104,14 @@ public abstract class AbstractStep {
         f += "])";
 
         return f;
+    }
+    public String getMuPadCommands() throws Exception {
+        String mupadCommands = "";
+        for(Map.Entry<String, IMatrix> entry: matrices) {
+            mupadCommands += "\n" + generateMupadMatrix(entry.getKey(), entry.getValue());
+        }
+
+        return mupadCommands;
     }
 
     public String getCommandDescription() {
@@ -166,10 +162,6 @@ public abstract class AbstractStep {
 
     public int getNumber() {
         return number;
-    }
-
-    public ICommand getCommand() {
-        return command;
     }
 
     public MatrixForm getForm() {

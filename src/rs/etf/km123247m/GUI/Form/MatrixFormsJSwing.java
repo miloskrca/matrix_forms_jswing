@@ -15,14 +15,11 @@ import rs.etf.km123247m.Parser.MatrixParser.SymJa.IExprMatrixStringParser;
 import rs.etf.km123247m.Parser.ParserTypes.StringParser;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -45,10 +42,8 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
 
     //menu
     JMenuBar menuBar;
-    JMenu menu, submenu;
+    JMenu menu;
     JMenuItem menuItem;
-    JRadioButtonMenuItem rbMenuItem;
-    JCheckBoxMenuItem cbMenuItem;
 
     private JPanel rootPanel;
     private JTextArea textMatrixInlineInput;
@@ -95,7 +90,6 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 stepSelected();
-                System.out.println(listSteps.getSelectedIndex());
             }
         });
 
@@ -149,7 +143,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                 stepObjects.clear();
                 panelMatrixDisplay.removeAll();
                 panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
-                panelMatrixDisplay.add(getPanel("\\text{Exception: " + event.getMessage() + "}"));
+                panelMatrixDisplay.add(new JLabel("Exception: " + event.getMessage()));
                 panelMatrixDisplay.repaint();
                 listSteps.setEnabled(false);
                 break;
@@ -170,11 +164,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
 
             try {
                 selectedStep = stepObjects.get(selected);
-                ArrayList<LaTexPanel> panels = selectedStep.getPanels();
-                panelMatrixDisplay.add(getPanel("\\text{" + selectedStep.getTitle() + "\n\n" + selectedStep.getDescription() + "}"));
-                for (LaTexPanel panel : panels) {
-                    panelMatrixDisplay.add(panel);
-                }
+                panelMatrixDisplay.add(selectedStep.getStepStatusPanel());
             } catch (Exception e) {
                 e.printStackTrace();
                 for (StackTraceElement s : e.getStackTrace()) {
@@ -182,6 +172,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                 }
             }
 
+            panelMatrixDisplay.revalidate();
             panelMatrixDisplay.repaint();
         }
     }
@@ -199,89 +190,76 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         return null;
     }
 
-
-    protected LaTexPanel getPanel(String formula) {
-        LaTexPanel panel = new LaTexPanel();
-
-        panel.setFormula(formula);
-        panel.render();
-
-        return panel;
-    }
-
     protected void addMenu() {
         //Create the menu bar.
         menuBar = new JMenuBar();
 
-        //Build the first menu.
-        menu = new JMenu("A Menu");
-        menu.setMnemonic(KeyEvent.VK_A);
-        menu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
+        // File
+        menu = new JMenu("File");
+        menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
 
-        //a group of JMenuItems
-        menuItem = new JMenuItem("A text-only menu item",
-                KeyEvent.VK_T);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_1, InputEvent.ALT_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription(
-                "This doesn't really do anything");
+        menuItem = new JMenuItem("Exit");
+        menuItem.setMnemonic(KeyEvent.VK_E);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
         menu.add(menuItem);
 
-        menuItem = new JMenuItem("Both text and icon",
-                new ImageIcon("images/middle.gif"));
-        menuItem.setMnemonic(KeyEvent.VK_B);
+        // Edit
+        menu = new JMenu("Examples");
+        menu.setMnemonic(KeyEvent.VK_X);
+
+        // Examples
+        menuItem = new JMenuItem("2x2");
+        menuItem.setMnemonic(KeyEvent.VK_2);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.TWOxTWO);
+            }
+        });
         menu.add(menuItem);
 
-        menuItem = new JMenuItem(new ImageIcon("images/middle.gif"));
-        menuItem.setMnemonic(KeyEvent.VK_D);
+        menuItem = new JMenuItem("3x3");
+        menuItem.setMnemonic(KeyEvent.VK_3);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.THREExTHREE);
+            }
+        });
         menu.add(menuItem);
 
-        //a group of radio button menu items
-        menu.addSeparator();
-        ButtonGroup group = new ButtonGroup();
-        rbMenuItem = new JRadioButtonMenuItem("A radio button menu item");
-        rbMenuItem.setSelected(true);
-        rbMenuItem.setMnemonic(KeyEvent.VK_R);
-        group.add(rbMenuItem);
-        menu.add(rbMenuItem);
+        menuItem = new JMenuItem("4x4");
+        menuItem.setMnemonic(KeyEvent.VK_4);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.FOURxFOUR);
+            }
+        });
+        menu.add(menuItem);
 
-        rbMenuItem = new JRadioButtonMenuItem("Another one");
-        rbMenuItem.setMnemonic(KeyEvent.VK_O);
-        group.add(rbMenuItem);
-        menu.add(rbMenuItem);
-
-        //a group of check box menu items
-        menu.addSeparator();
-        cbMenuItem = new JCheckBoxMenuItem("A check box menu item");
-        cbMenuItem.setMnemonic(KeyEvent.VK_C);
-        menu.add(cbMenuItem);
-
-        cbMenuItem = new JCheckBoxMenuItem("Another one");
-        cbMenuItem.setMnemonic(KeyEvent.VK_H);
-        menu.add(cbMenuItem);
-
-        //a submenu
-        menu.addSeparator();
-        submenu = new JMenu("A submenu");
-        submenu.setMnemonic(KeyEvent.VK_S);
-
-        menuItem = new JMenuItem("An item in the submenu");
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_2, ActionEvent.ALT_MASK));
-        submenu.add(menuItem);
-
-        menuItem = new JMenuItem("Another item");
-        submenu.add(menuItem);
-        menu.add(submenu);
-
-        //Build second menu in the menu bar.
-        menu = new JMenu("Another Menu");
-        menu.setMnemonic(KeyEvent.VK_N);
-        menu.getAccessibleContext().setAccessibleDescription(
-                "This menu does nothing");
         menuBar.add(menu);
+
+        // About
+        menu = new JMenu("Help");
+        menu.setMnemonic(KeyEvent.VK_H);
+        menuBar.add(menu);
+
+        menuItem = new JMenuItem("About");
+        menuItem.setMnemonic(KeyEvent.VK_A);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(MatrixFormsJSwing.this, "Eggs are not supposed to be green.");
+            }
+        });
+        menu.add(menuItem);
 
         this.setJMenuBar(menuBar);
     }
