@@ -4,7 +4,10 @@ import rs.etf.km123247m.Command.ICommand;
 import rs.etf.km123247m.Matrix.Forms.Implementation.RationalCanonicalMatrixForm;
 import rs.etf.km123247m.Matrix.Forms.MatrixForm;
 import rs.etf.km123247m.Matrix.Handler.MatrixHandler;
+import rs.etf.km123247m.Matrix.IMatrix;
 import rs.etf.km123247m.Observer.Event.FormEvent;
+
+import javax.swing.*;
 
 /**
  * Created by Miloš Krsmanović.
@@ -21,44 +24,62 @@ public class RationalCanonicalStep extends AbstractStep {
     @Override
     protected void saveStepStatusPanel() throws Exception {
         RationalCanonicalMatrixForm rForm = (RationalCanonicalMatrixForm) getForm();
+        IMatrix matrix;
         MatrixHandler handler = rForm.getHandler();
+        stepStatusPanel.add(new JLabel("<html>" + getDescription() + "</html>"));
         switch (getNumber()) {
             case START:
-                matrices.add(new MatrixEntry("A", handler.duplicate(rForm.getStartMatrix())));
+                matrix = handler.duplicate(rForm.getStartMatrix());
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                matrices.add(new MatrixEntry("A", matrix));
                 break;
             case INFO:
-                matrices.add(new MatrixEntry("A_I", handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()))));
+                matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                matrices.add(new MatrixEntry("A_I", matrix));
                 break;
             case END:
-                matrices.add(new MatrixEntry("A", handler.duplicate(rForm.getStartMatrix())));
-                matrices.add(new MatrixEntry("R", handler.duplicate(rForm.getFinalMatrix())));
-                matrices.add(new MatrixEntry("T", handler.duplicate(rForm.getT())));
+                matrix = handler.duplicate(rForm.getStartMatrix());
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                matrices.add(new MatrixEntry("A", matrix));
+                matrix = handler.duplicate(rForm.getFinalMatrix());
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("R", matrix)));
+                matrices.add(new MatrixEntry("R", matrix));
+                matrix = handler.duplicate(rForm.getT());
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("T", matrix)));
+                matrices.add(new MatrixEntry("T", matrix));
                 break;
             default:
                 //step
-                matrices.add(new MatrixEntry("P[" + rForm.getRound() + "]", handler.duplicate(rForm.getP(rForm.getRound()))));
-                matrices.add(new MatrixEntry("A_I", handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()))));
-                matrices.add(new MatrixEntry("Q[" + rForm.getRound() + "]", handler.duplicate(rForm.getQ(rForm.getRound()))));
+                matrix = handler.duplicate(rForm.getP(rForm.getRound()));
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("P[" + rForm.getRound() + "]", matrix)));
+                matrices.add(new MatrixEntry("P[" + rForm.getRound() + "]", matrix));
+                matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                matrices.add(new MatrixEntry("A_I", matrix));
+                matrix = handler.duplicate(rForm.getQ(rForm.getRound()));
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("Q[" + rForm.getRound() + "]", matrix)));
+                matrices.add(new MatrixEntry("Q[" + rForm.getRound() + "]", matrix));
         }
     }
 
     public String getDescription() {
-        String title = "\\begin{array}{l}";
+        String title = "";
         switch (getNumber()) {
             case START:
-                title += "\\text{\\LARGE Start }\\cr \\text{\\Large Starting transformation to Rational canonical form for matrix:}";
+                title += "Starting transformation to Rational canonical form for matrix:";
                 break;
             case INFO:
-                title += "\\text{\\LARGE Info }\\cr \\text{\\Large " + getEvent().getMessage() + "}";
+                title += getEvent().getMessage() + ".";
                 break;
             case END:
-                title += "\\text{\\LARGE Finish }\\cr \\text{\\Large Transformation ended. Result:}";
+                title += "Transformation ended.";
                 break;
             default:
                 //step
-                title += "\\text{\\LARGE Step " + getNumber() + "}\\cr \\text{\\Large " + getCommandDescription() + " }";
+                title += getCommandDescription();
         }
 
-        return title + "\\end{array}";
+        return title;
     }
 }

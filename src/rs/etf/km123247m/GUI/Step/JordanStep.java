@@ -37,22 +37,22 @@ public class JordanStep extends AbstractStep {
     }
 
     public String getDescription() {
-        String title = "\\begin{array}{l}";
+        String title = "";
         switch (getNumber()) {
             case START:
-                title += "\\text{\\LARGE Start }\\cr \\text{\\Large Starting transformation to Jordan canonical form for matrix:}";
+                title += "Starting transformation to Jordan canonical form for matrix:";
                 break;
             case INFO:
-                title += "\\text{\\LARGE Info }\\cr \\text{\\Large " + getEvent().getMessage() + "}";
+                title += getEvent().getMessage() + ".";
                 break;
             case END:
-                title += "\\text{\\LARGE Finish }\\cr \\text{\\Large Transformation ended. Result:}";
+                title += "Transformation ended.";
                 break;
             default:
                 //step
-                title += "\\text{\\LARGE Step " + getNumber() + "}\\cr \\text{\\Large " + getCommandDescription() + " }";
+                title += getCommandDescription();
         }
 
-        return title + "\\end{array}";
+        return title;
     }
 }

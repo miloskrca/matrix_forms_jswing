@@ -38,7 +38,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
 
     ArrayList<AbstractStep> stepObjects = new ArrayList<AbstractStep>();
     private int count = 0;
-    private int currentlySelectedStep = 0;
+    private int currentlySelectedStep = -1;
 
     //menu
     JMenuBar menuBar;
@@ -129,8 +129,8 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
             case FormEvent.PROCESSING_END:
                 step = getStep(AbstractStep.END, null, event, form);
                 stepObjects.add(step);
-                listSteps.setSelectedIndex(stepObjects.size() - 1);
                 listSteps.setEnabled(true);
+                listSteps.setSelectedIndex(stepObjects.size() - 1);
                 System.out.println("End");
                 DefaultListModel<String> listModel = new DefaultListModel<String>();
                 for(AbstractStep aStep : stepObjects) {
@@ -153,7 +153,8 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private void stepSelected() {
         if (stepObjects.size() > 0) {
             int selected = listSteps.getSelectedIndex();
-            if(currentlySelectedStep == selected || currentlySelectedStep == -1) {
+            System.out.println(selected + " " + currentlySelectedStep);
+            if(currentlySelectedStep == selected || selected == -1) {
                 return;
             }
             currentlySelectedStep = selected;
