@@ -26,7 +26,7 @@ public class SmithStep extends AbstractStep {
         SmithMatrixForm sForm = (SmithMatrixForm) getForm();
         IMatrix matrix;
         MatrixHandler handler = sForm.getHandler();
-        stepStatusPanel.add(new JLabel("<html>" + getDescription() + "</html>"));
+        stepStatusPanel.add(new JLabel("<html><h3>" + getDescription() + "</h3></html>"));
         switch (getNumber()) {
             case START:
                 matrix = handler.duplicate(sForm.getStartMatrix());
@@ -35,12 +35,16 @@ public class SmithStep extends AbstractStep {
                 break;
             case INFO:
                 matrix = handler.duplicate(sForm.getFinalMatrix());
+                stepStatusPanel.add(new JLabel("Current state of matrix [A]:"));
                 stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                    addFixingDiagonalExplanation();
+                }
                 matrices.add(new MatrixEntry("A_I", matrix));
                 break;
             case END:
                 matrix = handler.duplicate(sForm.getStartMatrix());
-                stepStatusPanel.add(new JLabel("Initial matrix [A]:"));
+                stepStatusPanel.add(new JLabel("Starting matrix [A]:"));
                 stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 matrix = handler.duplicate(sForm.getFinalMatrix());
@@ -57,13 +61,19 @@ public class SmithStep extends AbstractStep {
     }
 
     public String getDescription() {
-        String title;
+        String title = "";
         switch (getNumber()) {
             case START:
                 title = "Starting transformation to Smith normal form for matrix [A]:";
                 break;
             case INFO:
-                title = getEvent().getMessage() + ".";
+                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                    title += "Elements on diagonal need fixing.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
+                    title += "Finished fixing elements on diagonal.";
+                } else {
+                    title += getEvent().getMessage() + ".";
+                }
                 break;
             case END:
                 title = "Transformation ended.";

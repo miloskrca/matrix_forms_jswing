@@ -3,7 +3,11 @@ package rs.etf.km123247m.GUI.Step;
 import rs.etf.km123247m.Command.ICommand;
 import rs.etf.km123247m.Matrix.Forms.Implementation.JordanMatrixForm;
 import rs.etf.km123247m.Matrix.Forms.MatrixForm;
+import rs.etf.km123247m.Matrix.Handler.MatrixHandler;
+import rs.etf.km123247m.Matrix.IMatrix;
 import rs.etf.km123247m.Observer.Event.FormEvent;
+
+import javax.swing.*;
 
 /**
  * Created by Miloš Krsmanović.
@@ -19,20 +23,42 @@ public class JordanStep extends AbstractStep {
     @Override
     protected void saveStepStatusPanel() throws Exception {
         JordanMatrixForm jForm = (JordanMatrixForm) getForm();
+        IMatrix matrix;
+        MatrixHandler handler = jForm.getHandler();
+        stepStatusPanel.add(new JLabel("<html><h3>" + getDescription() + "</h3></html>"));
         switch (getNumber()) {
             case START:
-                matrices.add(new MatrixEntry("A", jForm.getHandler().duplicate(jForm.getStartMatrix())));
+                matrix = handler.duplicate(jForm.getStartMatrix());
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                matrices.add(new MatrixEntry("A", matrix));
                 break;
             case INFO:
-                matrices.add(new MatrixEntry("A_I", jForm.getHandler().duplicate(jForm.getTransitionalMatrix())));
+                matrix = handler.duplicate(jForm.getTransitionalMatrix());
+                stepStatusPanel.add(new JLabel("Current state of matrix [A]:"));
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                    addFixingDiagonalExplanation();
+                } else if(getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
+                    // TODO: matrices are empty for some reason
+//                    addSubtractForSmithExplanation(matrices.get(matrices.size() - 1).getValue());
+                }
+                matrices.add(new MatrixEntry("A_I", matrix));
                 break;
             case END:
-                matrices.add(new MatrixEntry("A", jForm.getHandler().duplicate(jForm.getStartMatrix())));
-                matrices.add(new MatrixEntry("J", jForm.getHandler().duplicate(jForm.getFinalMatrix())));
+                matrix = handler.duplicate(jForm.getStartMatrix());
+                stepStatusPanel.add(new JLabel("Starting matrix [A]:"));
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                matrices.add(new MatrixEntry("A", matrix));
+                matrix = handler.duplicate(jForm.getFinalMatrix());
+                stepStatusPanel.add(new JLabel("Transformed matrix [J]:"));
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("J", matrix)));
+                matrices.add(new MatrixEntry("J", matrix));
                 break;
             default:
                 //step
-                matrices.add(new MatrixEntry("A_I", jForm.getHandler().duplicate(jForm.getTransitionalMatrix())));
+                matrix = handler.duplicate(jForm.getTransitionalMatrix());
+                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                matrices.add(new MatrixEntry("A_I", matrix));
         }
     }
 
@@ -43,7 +69,13 @@ public class JordanStep extends AbstractStep {
                 title += "Starting transformation to Jordan canonical form for matrix:";
                 break;
             case INFO:
-                title += getEvent().getMessage() + ".";
+                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                    title += "Elements on diagonal need fixing.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
+                    title += "Finished fixing elements on diagonal.";
+                } else {
+                    title += getEvent().getMessage() + ".";
+                }
                 break;
             case END:
                 title += "Transformation ended.";

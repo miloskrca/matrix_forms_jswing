@@ -4,7 +4,10 @@ import rs.etf.km123247m.Command.ICommand;
 import rs.etf.km123247m.Command.MatrixCommand.*;
 import rs.etf.km123247m.Matrix.Forms.MatrixForm;
 import rs.etf.km123247m.Matrix.IMatrix;
+import rs.etf.km123247m.Matrix.Implementation.ArrayMatrix;
+import rs.etf.km123247m.Matrix.MatrixCell;
 import rs.etf.km123247m.Observer.Event.FormEvent;
+import rs.etf.km123247m.Polynomial.Term;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -72,7 +75,7 @@ public abstract class AbstractStep {
     }
 
     protected String generateLatexMatrix(String name, IMatrix matrix) throws Exception {
-        String f = name +" = \\begin{bmatrix}";
+        String f = (name != null ? name + " = " : "") + "\\begin{bmatrix}";
         for (int row = 0; row < matrix.getRowNumber(); row++) {
             for (int column = 0; column < matrix.getColumnNumber(); column++) {
                 f += matrix.get(row, column).getElement().toString();
@@ -86,6 +89,43 @@ public abstract class AbstractStep {
 
         return f;
     }
+
+    /**
+     * Generate example matrix for displaying in step preview
+     *
+     * @return Example matrix string
+     */
+    protected String getExampleLatexMatrix() {
+        String result = "";
+        IMatrix example = new ArrayMatrix(4, 4);
+        try {
+            example.set(new MatrixCell(0, 0, "b1(x)"));
+            example.set(new MatrixCell(0, 1, "0"));
+            example.set(new MatrixCell(0, 2, "..."));
+            example.set(new MatrixCell(0, 3, "0"));
+
+            example.set(new MatrixCell(1, 0, "0"));
+            example.set(new MatrixCell(1, 1, "b2(x)"));
+            example.set(new MatrixCell(1, 2, "..."));
+            example.set(new MatrixCell(1, 3, "0"));
+
+            example.set(new MatrixCell(2, 0, "..."));
+            example.set(new MatrixCell(2, 1, "..."));
+            example.set(new MatrixCell(2, 2, "..."));
+            example.set(new MatrixCell(2, 3, ".."));
+
+            example.set(new MatrixCell(3, 0, "0"));
+            example.set(new MatrixCell(3, 1, "0"));
+            example.set(new MatrixCell(3, 2, "..."));
+            example.set(new MatrixCell(3, 3, "bm(x)")); // TODO: LaTex syntax
+            result = generateLatexMatrix("B", example);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
     protected String generateMupadMatrix(String name, IMatrix matrix) throws Exception {
         String f = name + " := matrix([";
         for (int row = 0; row < matrix.getRowNumber(); row++) {
@@ -133,7 +173,7 @@ public abstract class AbstractStep {
                 MultiplyRowWithElementAndAddToRowAndStoreCommand comm = (MultiplyRowWithElementAndAddToRowAndStoreCommand)command;
                 description = "Multiplying row "
                         + comm.getRow1() + " with element "
-                        + comm.getElement().toString() + " and saving to row "
+                        + comm.getElement().toString() + " and adding to row "
                         + comm.getRow2() + ".";
             } else if (commandClass.equals("MultiplyColumnWithElementAndStoreCommand")) {
                 MultiplyColumnWithElementAndStoreCommand comm = (MultiplyColumnWithElementAndStoreCommand)command;
@@ -144,7 +184,7 @@ public abstract class AbstractStep {
                 MultiplyColumnWithElementAndAddToColumnAndStoreCommand comm = (MultiplyColumnWithElementAndAddToColumnAndStoreCommand)command;
                 description = "Multiplying column "
                         + comm.getColumn1() + " with element "
-                        + comm.getElement().toString() + " and saving to column "
+                        + comm.getElement().toString() + " and adding to column "
                         + comm.getColumn2() + ".";
             } else if (commandClass.equals("AddRowsAndStoreCommand")) {
                 AddRowsAndStoreCommand comm = (AddRowsAndStoreCommand)command;
@@ -158,6 +198,27 @@ public abstract class AbstractStep {
         }
 
         return description;
+    }
+
+    /**
+     * Add explanation why are we fixing the diagonal to display panel.
+     */
+    protected void addFixingDiagonalExplanation() {
+        stepStatusPanel.add(new JLabel("<html><br>Elements on the diagonal need fixing if the following is not true:</html>"));
+        // TODO: LaTex syntax
+        stepStatusPanel.add(getLaTexPanel("b1(x)|b2(x)|...|bm(x)"));
+        stepStatusPanel.add(new JLabel("For some matrix B:"));
+        stepStatusPanel.add(getLaTexPanel(getExampleLatexMatrix()));
+    }
+
+    /**
+     * Add explanation how are we preparing the matrix for smith transformation to display panel.
+     * @param matrix
+     */
+    protected void addSubtractForSmithExplanation(IMatrix matrix) throws Exception {
+        stepStatusPanel.add(new JLabel("<html><br>The matrix first needs to be subtracted by a diagonal matrix<br>before it is transformed to Smith form:</html>"));
+        stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("I", form.getHandler().diagonal(matrix.getRowNumber(), form.getHandler().getObjectFromString(String.valueOf(Term.X))))));
+        stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
     }
 
     public int getNumber() {

@@ -15,12 +15,11 @@ import rs.etf.km123247m.Parser.MatrixParser.SymJa.IExprMatrixStringParser;
 import rs.etf.km123247m.Parser.ParserTypes.StringParser;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Observable;
 
@@ -51,41 +50,20 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private JComboBox comboFormSelect;
     private JPanel panelMatrixDisplay;
     private JList<String> listSteps;
+    private JDialog muPadDialog;
+    private JDialog aboutDialog;
 
-    public MatrixFormsJSwing() {
-        super("Matrix Forms JSwing");
+    public MatrixFormsJSwing(String[] args) {
+        super("Smiths, rational i Jordans form");
         addMenu();
 
         btnStart.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                count = 1;
-                stepObjects.clear();
-                StringParser parser = new IExprMatrixStringParser(true);
-                parser.setInputString(textMatrixInlineInput.getText());
-                try {
-                    String selectedItem = comboFormSelect.getSelectedItem().toString();
-                    if (selectedItem != null) {
-                        IMatrix matrix = (IMatrix) parser.parseInput();
-                        MatrixHandler handler = new SymJaMatrixHandler(matrix);
-                        MatrixForm matrixForm = null;
-                        if (selectedItem.equals(SMITH_FORM)) {
-                            matrixForm = new SmithMatrixForm(handler);
-                        } else if (selectedItem.equals(RATIONAL_FORM)) {
-                            matrixForm = new PolynomialRationalCanonicalMatrixForm(handler);
-                        } else if (selectedItem.equals(JORDANS_FORM)) {
-                            matrixForm = new JordanMatrixForm(handler);
-                        }
-                        if (matrixForm != null) {
-                            matrixForm.addObserver(MatrixFormsJSwing.this);
-                            matrixForm.start();
-                        }
-                    }
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+            public void actionPerformed(ActionEvent event) {
+                startTransformation();
             }
         });
+
         listSteps.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -97,6 +75,83 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         pack();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+        checkForParametersAndHandle(args);
+    }
+
+    private void checkForParametersAndHandle(String[] parameters) {
+        boolean paramMatrix = false;
+        boolean paramForm = false;
+        boolean paramRun = false;
+        for (String param : parameters) {
+            if (param.contains("--matrix")) {
+                paramMatrix = true;
+                textMatrixInlineInput.setText(param.split("--matrix=")[1]);
+            } else if (param.contains("--form")) {
+                int option = Integer.parseInt(param.split("--form=")[1]);
+                if (option >= 0 && option <= comboFormSelect.getComponentCount()) {
+                    paramForm = true;
+                    comboFormSelect.setSelectedIndex(option);
+                } else {
+                    System.out.println("--form option out of bounds. Available from 0 to " + (comboFormSelect.getComponentCount()));
+                }
+            } else if (param.equals("--run")) {
+                paramRun = true;
+            } else {
+                System.out.println("Parameter not recognized (" + param + ")");
+            }
+        }
+        if(paramRun) {
+            if(paramForm && paramMatrix) {
+                startTransformation();
+            } else {
+                if (!paramForm) {
+                    System.out.println("--form option needs to be set properly to be able to run.");
+                }
+                if (!paramMatrix) {
+                    System.out.println("--matrix option needs to be set properly to be able to run.");
+                }
+            }
+        }
+    }
+
+    private void startTransformation() {
+        count = 1;
+        stepObjects.clear();
+        currentlySelectedStep = -1;
+
+        panelMatrixDisplay.removeAll();
+        panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
+        panelMatrixDisplay.add(new JLabel("Running..."));
+        panelMatrixDisplay.revalidate();
+        panelMatrixDisplay.repaint();
+
+        StringParser parser = new IExprMatrixStringParser(true);
+        String inputText = textMatrixInlineInput.getText();
+        if (!inputText.equals("")) {
+            parser.setInputString(inputText);
+            try {
+                String selectedItem = comboFormSelect.getSelectedItem().toString();
+                if (selectedItem != null) {
+                    IMatrix matrix = (IMatrix) parser.parseInput();
+                    MatrixHandler handler = new SymJaMatrixHandler(matrix);
+                    MatrixForm matrixForm = null;
+                    if (selectedItem.equals(SMITH_FORM)) {
+                        matrixForm = new SmithMatrixForm(handler);
+                    } else if (selectedItem.equals(RATIONAL_FORM)) {
+                        matrixForm = new PolynomialRationalCanonicalMatrixForm(handler);
+                    } else if (selectedItem.equals(JORDANS_FORM)) {
+                        matrixForm = new JordanMatrixForm(handler);
+                    }
+                    if (matrixForm != null) {
+                        matrixForm.addObserver(MatrixFormsJSwing.this);
+                        matrixForm.start();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                showException(e);
+            }
+        }
     }
 
     @Override
@@ -112,17 +167,17 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                 break;
             case FormEvent.PROCESSING_STEP:
                 ICommand stepCommand = form.getCommands().size() > 0 ? form.getCommands().getLast() : null;
-                step = getStep(count++, stepCommand, event, form);
-                stepObjects.add(step);
-                assert stepCommand != null;
-                System.out.println(stepCommand.getDescription());
-                System.out.println(form.getHandler().getMatrix().toString() + "\n");
+                if (stepCommand != null) {
+                    step = getStep(count++, stepCommand, event, form);
+                    stepObjects.add(step);
+                    System.out.println(stepCommand.getDescription());
+                    System.out.println(form.getHandler().getMatrix().toString() + "\n");
+                }
                 break;
             case FormEvent.PROCESSING_INFO:
                 ICommand infoCommand = form.getCommands().size() > 0 ? form.getCommands().getLast() : null;
                 step = getStep(AbstractStep.INFO, infoCommand, event, form);
                 stepObjects.add(step);
-                assert infoCommand != null;
                 System.out.println("Info");
                 System.out.println(form.getHandler().getMatrix().toString() + "\n");
                 break;
@@ -130,21 +185,20 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                 step = getStep(AbstractStep.END, null, event, form);
                 stepObjects.add(step);
                 listSteps.setEnabled(true);
-                listSteps.setSelectedIndex(stepObjects.size() - 1);
                 System.out.println("End");
                 DefaultListModel<String> listModel = new DefaultListModel<String>();
-                for(AbstractStep aStep : stepObjects) {
+                for (AbstractStep aStep : stepObjects) {
                     listModel.addElement(aStep.getTitle());
                 }
                 listSteps.setModel(listModel);
+                listSteps.setSelectedIndex(stepObjects.size() - 1);
+                stepSelected();
+                listSteps.grabFocus();
                 break;
             case FormEvent.PROCESSING_EXCEPTION:
                 System.out.println(event.getMessage());
                 stepObjects.clear();
-                panelMatrixDisplay.removeAll();
-                panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
-                panelMatrixDisplay.add(new JLabel("Exception: " + event.getMessage()));
-                panelMatrixDisplay.repaint();
+                showException(event);
                 listSteps.setEnabled(false);
                 break;
         }
@@ -153,28 +207,24 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private void stepSelected() {
         if (stepObjects.size() > 0) {
             int selected = listSteps.getSelectedIndex();
-            System.out.println(selected + " " + currentlySelectedStep);
-            if(currentlySelectedStep == selected || selected == -1) {
-                return;
-            }
-            currentlySelectedStep = selected;
-            AbstractStep selectedStep;
+            if (currentlySelectedStep != selected && selected != -1) {
+                currentlySelectedStep = selected;
+                AbstractStep selectedStep;
 
-            panelMatrixDisplay.removeAll();
-            panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
+                panelMatrixDisplay.removeAll();
+                panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
 
-            try {
-                selectedStep = stepObjects.get(selected);
-                panelMatrixDisplay.add(selectedStep.getStepStatusPanel());
-            } catch (Exception e) {
-                e.printStackTrace();
-                for (StackTraceElement s : e.getStackTrace()) {
-                    panelMatrixDisplay.add(new JLabel(s.toString()), BorderLayout.NORTH);
+                try {
+                    selectedStep = stepObjects.get(selected);
+                    panelMatrixDisplay.add(selectedStep.getStepStatusPanel());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    showException(e);
                 }
-            }
 
-            panelMatrixDisplay.revalidate();
-            panelMatrixDisplay.repaint();
+                panelMatrixDisplay.revalidate();
+                panelMatrixDisplay.repaint();
+            }
         }
     }
 
@@ -189,6 +239,23 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         }
 
         return null;
+    }
+
+    /**
+     * Displays exception message
+     *
+     * @param exception Occurred exception
+     */
+    private void showException(Object exception) {
+        panelMatrixDisplay.removeAll();
+        panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
+        if (exception instanceof Exception) {
+            panelMatrixDisplay.add(new JLabel("Exception: " + ((Exception) exception).getMessage()));
+        } else if (exception instanceof FormEvent) {
+            panelMatrixDisplay.add(new JLabel("Exception: " + ((FormEvent) exception).getMessage()));
+        }
+        panelMatrixDisplay.revalidate();
+        panelMatrixDisplay.repaint();
     }
 
     protected void addMenu() {
@@ -252,16 +319,99 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         menu.setMnemonic(KeyEvent.VK_H);
         menuBar.add(menu);
 
+        menuItem = new JMenuItem("Get MuPad command for visible matrices");
+        menuItem.setMnemonic(KeyEvent.VK_M);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMuPadDialog();
+            }
+        });
+        menu.add(menuItem);
+
         menuItem = new JMenuItem("About");
         menuItem.setMnemonic(KeyEvent.VK_A);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(MatrixFormsJSwing.this, "Eggs are not supposed to be green.");
+                showAboutDialog();
             }
         });
         menu.add(menuItem);
 
         this.setJMenuBar(menuBar);
+    }
+
+    /**
+     * MuPad commands dialog showing currently commands for generating
+     * currently visible matrices.
+     */
+    protected void showMuPadDialog() {
+        if (stepObjects.size() > 0) {
+            int selected = listSteps.getSelectedIndex();
+            if (selected != -1) {
+                currentlySelectedStep = selected;
+                AbstractStep selectedStep = stepObjects.get(selected);
+
+                if (muPadDialog == null) {
+                    muPadDialog = new JDialog(MatrixFormsJSwing.this);
+                    muPadDialog.setMinimumSize(new Dimension(300, 200));
+                }
+
+                try {
+                    muPadDialog.getContentPane().removeAll();
+                    muPadDialog.add(new JLabel("MuPad commands for generating visible matrices" +
+                            " of the selected step (" + selectedStep.getTitle() + "):"), BorderLayout.NORTH);
+                    muPadDialog.add(new JTextArea(selectedStep.getMuPadCommands()), BorderLayout.CENTER);
+                    muPadDialog.pack();
+                    muPadDialog.setVisible(true);
+                } catch (Exception e) {
+                    showException(e);
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * About dialog. TODO: make it better! Use labels! Maybe add logo!
+     */
+    protected void showAboutDialog() {
+        if (aboutDialog == null) {
+            aboutDialog = new JDialog(MatrixFormsJSwing.this);
+            aboutDialog.setTitle("About");
+            aboutDialog.setMinimumSize(new Dimension(400, 200));
+
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+            String textTitle = "Java application for Smiths, rational i Jordans form";
+            JLabel labelTitle = new JLabel(textTitle);
+            labelTitle.setHorizontalAlignment(SwingConstants.CENTER);
+            labelTitle.setVerticalAlignment(SwingConstants.TOP);
+            panel.add(labelTitle);
+
+            String textAuthor = "Author: Miloš Krsmanović";
+            JLabel labelAuthor = new JLabel(textAuthor);
+            labelAuthor.setHorizontalAlignment(SwingConstants.CENTER);
+            labelTitle.setVerticalAlignment(SwingConstants.CENTER);
+            panel.add(labelAuthor);
+
+            String textIndex = "Index: 2012/3247";
+            JLabel labelIndex = new JLabel(textIndex);
+            labelIndex.setHorizontalAlignment(SwingConstants.CENTER);
+            labelTitle.setVerticalAlignment(SwingConstants.CENTER);
+            panel.add(labelIndex);
+
+            String textInfo = "Za svrhu izrade master rada na Elektrotehničkom fakultetu u Beogradu.";
+            JLabel labelInfo = new JLabel(textInfo);
+            labelIndex.setHorizontalAlignment(SwingConstants.CENTER);
+            labelTitle.setVerticalAlignment(SwingConstants.CENTER);
+            panel.add(labelInfo);
+
+            aboutDialog.add(panel);
+        }
+        aboutDialog.setVisible(true);
     }
 }
