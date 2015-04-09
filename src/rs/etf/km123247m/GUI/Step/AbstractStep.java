@@ -10,6 +10,7 @@ import rs.etf.km123247m.Observer.Event.FormEvent;
 import rs.etf.km123247m.Polynomial.Term;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public abstract class AbstractStep {
 
         try {
             stepStatusPanel.setLayout(new BoxLayout(stepStatusPanel, BoxLayout.Y_AXIS));
+            addTitleToStepStatus(getDescription());
             saveStepStatusPanel();
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +50,7 @@ public abstract class AbstractStep {
 
     protected abstract void saveStepStatusPanel() throws Exception;
 
-    public static LaTexLabel getLaTexPanel(String formula) {
+    public static LaTexLabel getLaTexLabel(String formula) {
         LaTexLabel label = new LaTexLabel();
 
         label.setFormula(formula);
@@ -79,7 +81,7 @@ public abstract class AbstractStep {
         for (int row = 0; row < matrix.getRowNumber(); row++) {
             for (int column = 0; column < matrix.getColumnNumber(); column++) {
                 f += matrix.get(row, column).getElement().toString();
-                if(column < matrix.getColumnNumber() - 1) {
+                if (column < matrix.getColumnNumber() - 1) {
                     f += " & ";
                 }
             }
@@ -117,7 +119,7 @@ public abstract class AbstractStep {
             example.set(new MatrixCell(3, 0, "0"));
             example.set(new MatrixCell(3, 1, "0"));
             example.set(new MatrixCell(3, 2, "..."));
-            example.set(new MatrixCell(3, 3, "bm(x)")); // TODO: LaTex syntax
+            example.set(new MatrixCell(3, 3, "b_m(x)"));
             result = generateLatexMatrix("B", example);
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,12 +134,12 @@ public abstract class AbstractStep {
             f += "[";
             for (int column = 0; column < matrix.getColumnNumber(); column++) {
                 f += matrix.get(row, column).getElement().toString();
-                if(column < matrix.getColumnNumber() - 1) {
+                if (column < matrix.getColumnNumber() - 1) {
                     f += ",";
                 }
             }
             f += "]";
-            if(row < matrix.getRowNumber() - 1) {
+            if (row < matrix.getRowNumber() - 1) {
                 f += ",";
             }
         }
@@ -145,52 +147,63 @@ public abstract class AbstractStep {
 
         return f;
     }
+
+    /**
+     * MuPad Commands
+     * @return String containing MuPad commands for getting the matrices in MuPad
+     * @throws Exception
+     */
     public String getMuPadCommands() throws Exception {
         String mupadCommands = "";
-        for(Map.Entry<String, IMatrix> entry: matrices) {
+        for (Map.Entry<String, IMatrix> entry : matrices) {
             mupadCommands += "\n" + generateMupadMatrix(entry.getKey(), entry.getValue());
         }
 
         return mupadCommands;
     }
 
+    /**
+     * Command description
+     *
+     * @return String containing description pf the command class
+     */
     public String getCommandDescription() {
         String description = "";
-        if(command != null) {
+        if (command != null) {
             String commandClass = command.getClass().getSimpleName();
-            if(commandClass.equals("SwitchColumnsCommand")) {
-                SwitchColumnsCommand comm = (SwitchColumnsCommand)command;
+            if (commandClass.equals("SwitchColumnsCommand")) {
+                SwitchColumnsCommand comm = (SwitchColumnsCommand) command;
                 description = "Switching columns " + comm.getColumn1() + " and " + comm.getColumn2() + ".";
             } else if (commandClass.equals("SwitchRowsCommand")) {
-                SwitchRowsCommand comm = (SwitchRowsCommand)command;
+                SwitchRowsCommand comm = (SwitchRowsCommand) command;
                 description = "Switching rows " + comm.getRow1() + " and " + comm.getRow2() + ".";
             } else if (commandClass.equals("MultiplyRowWithElementAndStoreCommand")) {
-                MultiplyRowWithElementAndStoreCommand comm = (MultiplyRowWithElementAndStoreCommand)command;
+                MultiplyRowWithElementAndStoreCommand comm = (MultiplyRowWithElementAndStoreCommand) command;
                 description = "Multiplying row "
                         + comm.getRow() + " with element "
                         + comm.getElement().toString() + ".";
             } else if (commandClass.equals("MultiplyRowWithElementAndAddToRowAndStoreCommand")) {
-                MultiplyRowWithElementAndAddToRowAndStoreCommand comm = (MultiplyRowWithElementAndAddToRowAndStoreCommand)command;
+                MultiplyRowWithElementAndAddToRowAndStoreCommand comm = (MultiplyRowWithElementAndAddToRowAndStoreCommand) command;
                 description = "Multiplying row "
                         + comm.getRow1() + " with element "
                         + comm.getElement().toString() + " and adding to row "
                         + comm.getRow2() + ".";
             } else if (commandClass.equals("MultiplyColumnWithElementAndStoreCommand")) {
-                MultiplyColumnWithElementAndStoreCommand comm = (MultiplyColumnWithElementAndStoreCommand)command;
+                MultiplyColumnWithElementAndStoreCommand comm = (MultiplyColumnWithElementAndStoreCommand) command;
                 description = "Multiplying column "
                         + comm.getColumn() + " with element "
                         + comm.getElement().toString() + ".";
             } else if (commandClass.equals("MultiplyColumnWithElementAndAddToColumnAndStoreCommand")) {
-                MultiplyColumnWithElementAndAddToColumnAndStoreCommand comm = (MultiplyColumnWithElementAndAddToColumnAndStoreCommand)command;
+                MultiplyColumnWithElementAndAddToColumnAndStoreCommand comm = (MultiplyColumnWithElementAndAddToColumnAndStoreCommand) command;
                 description = "Multiplying column "
                         + comm.getColumn1() + " with element "
                         + comm.getElement().toString() + " and adding to column "
                         + comm.getColumn2() + ".";
             } else if (commandClass.equals("AddRowsAndStoreCommand")) {
-                AddRowsAndStoreCommand comm = (AddRowsAndStoreCommand)command;
+                AddRowsAndStoreCommand comm = (AddRowsAndStoreCommand) command;
                 description = "Adding rows " + comm.getRow1() + " and " + comm.getRow2() + ".";
             } else if (commandClass.equals("AddColumnsAndStoreCommand")) {
-                AddColumnsAndStoreCommand comm = (AddColumnsAndStoreCommand)command;
+                AddColumnsAndStoreCommand comm = (AddColumnsAndStoreCommand) command;
                 description = "Adding columns " + comm.getColumn1() + " and " + comm.getColumn2() + ".";
             } else {
                 description = commandClass;
@@ -201,24 +214,74 @@ public abstract class AbstractStep {
     }
 
     /**
+     * Step description
+     *
+     * @return String containing description of the step
+     */
+    public abstract String getDescription();
+
+    /**
      * Add explanation why are we fixing the diagonal to display panel.
      */
     protected void addFixingDiagonalExplanation() {
-        stepStatusPanel.add(new JLabel("<html><br>Elements on the diagonal need fixing if the following is not true:</html>"));
+        addToStepStatus(new JLabel("Elements on the diagonal need fixing if the following is not true:"));
         // TODO: LaTex syntax
-        stepStatusPanel.add(getLaTexPanel("b1(x)|b2(x)|...|bm(x)"));
-        stepStatusPanel.add(new JLabel("For some matrix B:"));
-        stepStatusPanel.add(getLaTexPanel(getExampleLatexMatrix()));
+        addToStepStatus(getLaTexLabel("b_1(x)|b_2(x)|...|b_m(x)"));
+        addToStepStatus(new JLabel("For some matrix B:"));
+        addToStepStatus(getLaTexLabel(getExampleLatexMatrix()));
     }
 
     /**
      * Add explanation how are we preparing the matrix for smith transformation to display panel.
-     * @param matrix
+     *
+     * @param matrix Matrix that is subtracted from xI
      */
     protected void addSubtractForSmithExplanation(IMatrix matrix) throws Exception {
-        stepStatusPanel.add(new JLabel("<html><br>The matrix first needs to be subtracted by a diagonal matrix<br>before it is transformed to Smith form:</html>"));
-        stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("I", form.getHandler().diagonal(matrix.getRowNumber(), form.getHandler().getObjectFromString(String.valueOf(Term.X))))));
-        stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+        addToStepStatus(new JLabel("The matrix first needs to be subtracted by a diagonal matrix"));
+        addToStepStatus(new JLabel("before it is transformed to Smith form:"));
+        addToStepStatus(getLaTexLabel("A_I = x*I-A"));
+        addToStepStatus(new JComponent[]{
+                getLaTexLabel(generateLatexMatrix("I", form.getHandler().diagonal(matrix.getRowNumber(), form.getHandler().getObjectFromString(String.valueOf(Term.X))))),
+                getLaTexLabel(generateLatexMatrix("A", matrix))
+        });
+    }
+
+    /**
+     * Adds component to the panel
+     *
+     * @param components Components
+     */
+    public void addToStepStatus(JComponent[] components) {
+        JPanel panel = new JPanel();
+        for (JComponent component : components) {
+            panel.add(component);
+        }
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        stepStatusPanel.add(panel);
+    }
+
+    /**
+     * Adds component to the panel
+     *
+     * @param component Component
+     */
+    public void addToStepStatus(JComponent component) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(component);
+        stepStatusPanel.add(panel);
+    }
+
+    /**
+     * Add title
+     *
+     * @param description Title text
+     */
+    protected void addTitleToStepStatus(String description) {
+        JLabel label = new JLabel(description);
+        Font font = new Font("Arial", Font.BOLD, 18);
+        label.setFont(font);
+        addToStepStatus(label);
     }
 
     public int getNumber() {

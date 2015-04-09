@@ -25,43 +25,42 @@ public class JordanStep extends AbstractStep {
         JordanMatrixForm jForm = (JordanMatrixForm) getForm();
         IMatrix matrix;
         MatrixHandler handler = jForm.getHandler();
-        stepStatusPanel.add(new JLabel("<html><h3>" + getDescription() + "</h3></html>"));
         switch (getNumber()) {
             case START:
                 matrix = handler.duplicate(jForm.getStartMatrix());
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 break;
             case INFO:
                 matrix = handler.duplicate(jForm.getTransitionalMatrix());
-                stepStatusPanel.add(new JLabel("Current state of matrix [A]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                addToStepStatus(new JLabel("Current state of matrix [A]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     addFixingDiagonalExplanation();
                 } else if(getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
-                    // TODO: matrices are empty for some reason
-//                    addSubtractForSmithExplanation(matrices.get(matrices.size() - 1).getValue());
+                    addSubtractForSmithExplanation(jForm.getStartMatrix());
                 }
                 matrices.add(new MatrixEntry("A_I", matrix));
                 break;
             case END:
                 matrix = handler.duplicate(jForm.getStartMatrix());
-                stepStatusPanel.add(new JLabel("Starting matrix [A]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                addToStepStatus(new JLabel("Starting matrix [A]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 matrix = handler.duplicate(jForm.getFinalMatrix());
-                stepStatusPanel.add(new JLabel("Transformed matrix [J]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("J", matrix)));
+                addToStepStatus(new JLabel("Transformed matrix [J]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("J", matrix)));
                 matrices.add(new MatrixEntry("J", matrix));
                 break;
             default:
                 //step
                 matrix = handler.duplicate(jForm.getTransitionalMatrix());
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 matrices.add(new MatrixEntry("A_I", matrix));
         }
     }
 
+    @Override
     public String getDescription() {
         String title = "";
         switch (getNumber()) {
@@ -73,6 +72,12 @@ public class JordanStep extends AbstractStep {
                     title += "Elements on diagonal need fixing.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
                     title += "Finished fixing elements on diagonal.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
+                    title += "Title INFO_SUBTRACT_FOR_SMITH.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
+                    title += "Title INFO_FIX_LEADING_COEFFICIENTS.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
+                    title += "Title INFO_END_FIX_LEADING_COEFFICIENTS.";
                 } else {
                     title += getEvent().getMessage() + ".";
                 }

@@ -26,61 +26,59 @@ public class RationalCanonicalStep extends AbstractStep {
         RationalCanonicalMatrixForm rForm = (RationalCanonicalMatrixForm) getForm();
         IMatrix matrix;
         MatrixHandler handler = rForm.getHandler();
-        stepStatusPanel.add(new JLabel("<html><h3>" + getDescription() + "</h3></html>"));
         switch (getNumber()) {
             case START:
                 matrix = handler.duplicate(rForm.getStartMatrix());
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 break;
             case INFO:
                 matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
-                stepStatusPanel.add(new JLabel("Current state of matrix [A]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                addToStepStatus(new JLabel("Current state of matrix [A]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     addFixingDiagonalExplanation();
                 } else if(getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
-                    // TODO: matrices are empty for some reason
-//                    addSubtractForSmithExplanation(matrices.get(matrices.size() - 1).getValue());
+                    addSubtractForSmithExplanation(rForm.getStartMatrix());
                 }
                 matrices.add(new MatrixEntry("A_I", matrix));
                 break;
             case END:
                 matrix = handler.duplicate(rForm.getStartMatrix());
-                stepStatusPanel.add(new JLabel("Starting matrix [A]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                addToStepStatus(new JLabel("Starting matrix [A]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 matrix = handler.duplicate(rForm.getFinalMatrix());
-                stepStatusPanel.add(new JLabel("Transformed matrix [R]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("R", matrix)));
+                addToStepStatus(new JLabel("Transformed matrix [R]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("R", matrix)));
                 matrices.add(new MatrixEntry("R", matrix));
                 matrix = handler.duplicate(rForm.getT());
-                stepStatusPanel.add(new JLabel("Matrix [T]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("T", matrix)));
-                // TODO: T^-1 is not working correctly for LaTex
-                stepStatusPanel.add(getLaTexPanel("T^-1*A*T = R(A)"));
-                stepStatusPanel.add(new JLabel("R(A): Transformation of matrix A to rational form"));
+                addToStepStatus(new JLabel("Matrix [T]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("T", matrix)));
+                addToStepStatus(getLaTexLabel("T^{-1}*A*T = R(A)"));
+                addToStepStatus(new JLabel("R(A): Transformation of matrix A to rational form"));
                 matrices.add(new MatrixEntry("T", matrix));
                 break;
             default:
                 //step
                 matrix = handler.duplicate(rForm.getP(rForm.getRound()));
-                stepStatusPanel.add(new JLabel("Current state of matrix [P]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("P[" + rForm.getRound() + "]", matrix)));
+                addToStepStatus(new JLabel("Current state of matrix [P]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("P[" + rForm.getRound() + "]", matrix)));
                 matrices.add(new MatrixEntry("P[" + rForm.getRound() + "]", matrix));
                 matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
-                stepStatusPanel.add(new JLabel("Current state of matrix [A]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                addToStepStatus(new JLabel("Current state of matrix [A]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 matrices.add(new MatrixEntry("A_I", matrix));
                 matrix = handler.duplicate(rForm.getQ(rForm.getRound()));
-                stepStatusPanel.add(new JLabel("Current state of matrix [Q]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("Q[" + rForm.getRound() + "]", matrix)));
+                addToStepStatus(new JLabel("Current state of matrix [Q]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("Q[" + rForm.getRound() + "]", matrix)));
                 matrices.add(new MatrixEntry("Q[" + rForm.getRound() + "]", matrix));
-                stepStatusPanel.add(new JLabel("P: Reflects operations on rows."));
-                stepStatusPanel.add(new JLabel("Q: Reflects operations on columns."));
+                addToStepStatus(new JLabel("P: Reflects operations on rows."));
+                addToStepStatus(new JLabel("Q: Reflects operations on columns."));
         }
     }
 
+    @Override
     public String getDescription() {
         String title = "";
         switch (getNumber()) {
@@ -92,6 +90,14 @@ public class RationalCanonicalStep extends AbstractStep {
                     title += "Elements on diagonal need fixing.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
                     title += "Finished fixing elements on diagonal.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
+                    title += "Title INFO_SUBTRACT_FOR_SMITH.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_FINISH_RATIONAL_START_T)) {
+                    title += "Title INFO_RATIONAL_FINISH_RATIONAL_START_T.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
+                    title += "Title INFO_FIX_LEADING_COEFFICIENTS.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
+                    title += "Title INFO_END_FIX_LEADING_COEFFICIENTS.";
                 } else {
                     title += getEvent().getMessage() + ".";
                 }

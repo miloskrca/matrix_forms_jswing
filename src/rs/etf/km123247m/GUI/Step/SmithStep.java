@@ -26,17 +26,16 @@ public class SmithStep extends AbstractStep {
         SmithMatrixForm sForm = (SmithMatrixForm) getForm();
         IMatrix matrix;
         MatrixHandler handler = sForm.getHandler();
-        stepStatusPanel.add(new JLabel("<html><h3>" + getDescription() + "</h3></html>"));
         switch (getNumber()) {
             case START:
                 matrix = handler.duplicate(sForm.getStartMatrix());
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 break;
             case INFO:
                 matrix = handler.duplicate(sForm.getFinalMatrix());
-                stepStatusPanel.add(new JLabel("Current state of matrix [A]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                addToStepStatus(new JLabel("Current state of matrix [A]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     addFixingDiagonalExplanation();
                 }
@@ -44,22 +43,23 @@ public class SmithStep extends AbstractStep {
                 break;
             case END:
                 matrix = handler.duplicate(sForm.getStartMatrix());
-                stepStatusPanel.add(new JLabel("Starting matrix [A]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A", matrix)));
+                addToStepStatus(new JLabel("Starting matrix [A]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 matrix = handler.duplicate(sForm.getFinalMatrix());
-                stepStatusPanel.add(new JLabel("Transformed matrix [S]:"));
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("S", matrix)));
+                addToStepStatus(new JLabel("Transformed matrix [S]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("S", matrix)));
                 matrices.add(new MatrixEntry("S", matrix));
                 break;
             default:
                 //step
                 matrix = handler.duplicate(sForm.getFinalMatrix());
-                stepStatusPanel.add(getLaTexPanel(generateLatexMatrix("A_I", matrix)));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 matrices.add(new MatrixEntry("A_I", sForm.getHandler().duplicate(sForm.getFinalMatrix())));
         }
     }
 
+    @Override
     public String getDescription() {
         String title = "";
         switch (getNumber()) {
@@ -71,6 +71,10 @@ public class SmithStep extends AbstractStep {
                     title += "Elements on diagonal need fixing.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
                     title += "Finished fixing elements on diagonal.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
+                    title += "Title INFO_FIX_LEADING_COEFFICIENTS.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
+                    title += "Title INFO_END_FIX_LEADING_COEFFICIENTS.";
                 } else {
                     title += getEvent().getMessage() + ".";
                 }

@@ -120,7 +120,6 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         currentlySelectedStep = -1;
 
         panelMatrixDisplay.removeAll();
-        panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
         panelMatrixDisplay.add(new JLabel("Running..."));
         panelMatrixDisplay.revalidate();
         panelMatrixDisplay.repaint();
@@ -248,7 +247,6 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
      */
     private void showException(Object exception) {
         panelMatrixDisplay.removeAll();
-        panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
         if (exception instanceof Exception) {
             panelMatrixDisplay.add(new JLabel("Exception: " + ((Exception) exception).getMessage()));
         } else if (exception instanceof FormEvent) {
@@ -383,7 +381,6 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
             aboutDialog.setMinimumSize(new Dimension(400, 200));
 
             JPanel panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
             String textTitle = "Java application for Smiths, rational i Jordans form";
