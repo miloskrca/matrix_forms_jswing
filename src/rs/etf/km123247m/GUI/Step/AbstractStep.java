@@ -225,7 +225,6 @@ public abstract class AbstractStep {
      */
     protected void addFixingDiagonalExplanation() {
         addToStepStatus(new JLabel("Elements on the diagonal need fixing if the following is not true:"));
-        // TODO: LaTex syntax
         addToStepStatus(getLaTexLabel("b_1(x)|b_2(x)|...|b_m(x)"));
         addToStepStatus(new JLabel("For some matrix B:"));
         addToStepStatus(getLaTexLabel(getExampleLatexMatrix()));
