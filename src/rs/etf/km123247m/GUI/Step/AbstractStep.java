@@ -159,15 +159,17 @@ public abstract class AbstractStep {
         for (Map.Entry<String, IMatrix> entry : matrices) {
             mupadCommands += "\n" + generateMupadMatrix(entry.getKey(), entry.getValue()) + ";";
         }
-        String className = this.getClass().getName();
-        mupadCommands += "\n";
-        if(className.contains("Jordan")) {
-            mupadCommands += "J1 := linalg::jordanForm(A);";
-        } else if (className.contains("RationalCanonical")) {
-            mupadCommands += "R1 := linalg::frobeniusForm(A);";
-            mupadCommands += "\nR2 := T^(-1) * A * T;";
-        } else if (className.contains("Smith")) {
-            mupadCommands += "S1 := linalg::smithForm(A);";
+        if(getNumber() == END) {
+            String className = this.getClass().getName();
+            mupadCommands += "\n";
+            if (className.contains("Jordan")) {
+                mupadCommands += "J1 := linalg::jordanForm(A);";
+            } else if (className.contains("RationalCanonical")) {
+                mupadCommands += "R1 := linalg::frobeniusForm(A);";
+                mupadCommands += "\nR2 := T^(-1) * A * T;";
+            } else if (className.contains("Smith")) {
+                mupadCommands += "S1 := linalg::smithForm(A);";
+            }
         }
 
         return mupadCommands;
