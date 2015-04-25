@@ -80,7 +80,7 @@ public class JordanStep extends AbstractStep {
         addToStepStatus(new JLabel("Roots:"));
         ArrayList<Object> roots = jForm.getRoots();
         for (int i = 0; i < roots.size(); i++) {
-            addToStepStatus(getLaTexLabel( "x_" + i + "=" + roots.get(i)));
+            addToStepStatus(getLaTexLabel( "x_" + i + "=" + getLatexFromMatrixElement(roots.get(i))));
         }
     }
 

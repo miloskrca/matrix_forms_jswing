@@ -1,5 +1,6 @@
 package rs.etf.km123247m.GUI.Step;
 
+import org.matheclipse.core.form.tex.TeXFormFactory;
 import rs.etf.km123247m.Command.ICommand;
 import rs.etf.km123247m.Command.MatrixCommand.*;
 import rs.etf.km123247m.Matrix.Forms.MatrixForm;
@@ -80,7 +81,7 @@ public abstract class AbstractStep {
         String f = (name != null ? name + " = " : "") + "\\begin{bmatrix}";
         for (int row = 0; row < matrix.getRowNumber(); row++) {
             for (int column = 0; column < matrix.getColumnNumber(); column++) {
-                f += matrix.get(row, column).getElement().toString();
+                f += getLatexFromMatrixElement(matrix.get(row, column).getElement());
                 if (column < matrix.getColumnNumber() - 1) {
                     f += " & ";
                 }
@@ -156,10 +157,34 @@ public abstract class AbstractStep {
     public String getMuPadCommands() throws Exception {
         String mupadCommands = "";
         for (Map.Entry<String, IMatrix> entry : matrices) {
-            mupadCommands += "\n" + generateMupadMatrix(entry.getKey(), entry.getValue());
+            mupadCommands += "\n" + generateMupadMatrix(entry.getKey(), entry.getValue()) + ";";
+        }
+        String className = this.getClass().getName();
+        mupadCommands += "\n";
+        if(className.contains("Jordan")) {
+            mupadCommands += "J1 := linalg::jordanForm(A);";
+        } else if (className.contains("RationalCanonical")) {
+            mupadCommands += "R1 := linalg::frobeniusForm(A);";
+            mupadCommands += "\nR2 := T^(-1) * A * T;";
+        } else if (className.contains("Smith")) {
+            mupadCommands += "S1 := linalg::smithForm(A);";
         }
 
         return mupadCommands;
+    }
+
+    /**
+     * Returns a LaTex string from an object
+     *
+     * @param object Object
+     *
+     * @return LaTex string
+     */
+    public String getLatexFromMatrixElement(Object object) {
+        TeXFormFactory f = new TeXFormFactory();
+        StringBuffer sb = new StringBuffer();
+        f.convert(sb, object, 0);
+        return sb.toString();
     }
 
     /**
