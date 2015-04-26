@@ -78,9 +78,11 @@ public class JordanStep extends AbstractStep {
      */
     private void addEndGenerateBlocksForJordanExplanation(JordanMatrixForm jForm) {
         addToStepStatus(new JLabel("Roots:"));
-        ArrayList<Object> roots = jForm.getRoots();
+        ArrayList<ArrayList<Object>> roots = jForm.getRoots();
         for (int i = 0; i < roots.size(); i++) {
-            addToStepStatus(getLaTexLabel( "x_" + i + "=" + getLatexFromMatrixElement(roots.get(i))));
+            for (int j = 0; j < roots.get(i).size(); j++) {
+                addToStepStatus(getLaTexLabel( "x_" + (i + j) + "=" + getLatexFromMatrixElement(roots.get(i).get(j))));
+            }
         }
     }
 

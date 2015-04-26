@@ -74,6 +74,7 @@
                   <component id="495cb" class="javax.swing.JTextPane">
                     <constraints/>
                     <properties>
+                      <editable value="false"/>
                       <text value="Instructions:&#10;Use comma (,) to sepparate columns in row.&#10;Use semicolon (;) to sepparate rows."/>
                     </properties>
                   </component>
