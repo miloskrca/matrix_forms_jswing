@@ -67,13 +67,13 @@ public abstract class AbstractStep {
     public String getTitle() {
         switch (number) {
             case START:
-                return "Start";
+                return "Početak";
             case INFO:
                 return "Info";
             case END:
-                return "Finish";
+                return "Kraj";
             default:
-                return "Step " + number;
+                return "Korak " + number;
         }
     }
 
@@ -200,38 +200,38 @@ public abstract class AbstractStep {
             String commandClass = command.getClass().getSimpleName();
             if (commandClass.equals("SwitchColumnsCommand")) {
                 SwitchColumnsCommand comm = (SwitchColumnsCommand) command;
-                description = "Switching columns " + comm.getColumn1() + " and " + comm.getColumn2() + ".";
+                description = "Zamena kolona " + comm.getColumn1() + " i " + comm.getColumn2() + ".";
             } else if (commandClass.equals("SwitchRowsCommand")) {
                 SwitchRowsCommand comm = (SwitchRowsCommand) command;
-                description = "Switching rows " + comm.getRow1() + " and " + comm.getRow2() + ".";
+                description = "Zamena redova " + comm.getRow1() + " i " + comm.getRow2() + ".";
             } else if (commandClass.equals("MultiplyRowWithElementAndStoreCommand")) {
                 MultiplyRowWithElementAndStoreCommand comm = (MultiplyRowWithElementAndStoreCommand) command;
-                description = "Multiplying row "
-                        + comm.getRow() + " with element "
+                description = "Množenje reda "
+                        + comm.getRow() + " sa elementom "
                         + comm.getElement().toString() + ".";
             } else if (commandClass.equals("MultiplyRowWithElementAndAddToRowAndStoreCommand")) {
                 MultiplyRowWithElementAndAddToRowAndStoreCommand comm = (MultiplyRowWithElementAndAddToRowAndStoreCommand) command;
-                description = "Multiplying row "
-                        + comm.getRow1() + " with element "
-                        + comm.getElement().toString() + " and adding to row "
+                description = "Množenje reda"
+                        + comm.getRow1() + " sa elementom "
+                        + comm.getElement().toString() + " i dodavanje redu "
                         + comm.getRow2() + ".";
             } else if (commandClass.equals("MultiplyColumnWithElementAndStoreCommand")) {
                 MultiplyColumnWithElementAndStoreCommand comm = (MultiplyColumnWithElementAndStoreCommand) command;
-                description = "Multiplying column "
-                        + comm.getColumn() + " with element "
+                description = "Množenje kolone "
+                        + comm.getColumn() + " sa elementom "
                         + comm.getElement().toString() + ".";
             } else if (commandClass.equals("MultiplyColumnWithElementAndAddToColumnAndStoreCommand")) {
                 MultiplyColumnWithElementAndAddToColumnAndStoreCommand comm = (MultiplyColumnWithElementAndAddToColumnAndStoreCommand) command;
-                description = "Multiplying column "
-                        + comm.getColumn1() + " with element "
-                        + comm.getElement().toString() + " and adding to column "
+                description = "Množenje kolone "
+                        + comm.getColumn1() + " sa elementom "
+                        + comm.getElement().toString() + " i dodavanje koloni "
                         + comm.getColumn2() + ".";
             } else if (commandClass.equals("AddRowsAndStoreCommand")) {
                 AddRowsAndStoreCommand comm = (AddRowsAndStoreCommand) command;
-                description = "Adding rows " + comm.getRow1() + " and " + comm.getRow2() + ".";
+                description = "Sabiranje redova " + comm.getRow1() + " i " + comm.getRow2() + ".";
             } else if (commandClass.equals("AddColumnsAndStoreCommand")) {
                 AddColumnsAndStoreCommand comm = (AddColumnsAndStoreCommand) command;
-                description = "Adding columns " + comm.getColumn1() + " and " + comm.getColumn2() + ".";
+                description = "Sabiranje kolona " + comm.getColumn1() + " i " + comm.getColumn2() + ".";
             } else {
                 description = commandClass;
             }
@@ -251,9 +251,9 @@ public abstract class AbstractStep {
      * Add explanation why are we fixing the diagonal to display panel.
      */
     protected void addFixingDiagonalExplanation() {
-        addToStepStatus(new JLabel("Elements on the diagonal need fixing if the following is not true:"));
+        addToStepStatus(new JLabel("Treba popraviti elemente na dijagonali ako sledeće nije istinito:"));
         addToStepStatus(getLaTexLabel("b_1(x)|b_2(x)|...|b_m(x)"));
-        addToStepStatus(new JLabel("For some matrix B:"));
+        addToStepStatus(new JLabel("Za matricu B:"));
         addToStepStatus(getLaTexLabel(getExampleLatexMatrix()));
     }
 
@@ -263,8 +263,8 @@ public abstract class AbstractStep {
      * @param matrix Matrix that is subtracted from xI
      */
     protected void addSubtractForSmithExplanation(IMatrix matrix) throws Exception {
-        addToStepStatus(new JLabel("The matrix first needs to be subtracted by a diagonal matrix"));
-        addToStepStatus(new JLabel("before it is transformed to Smith form:"));
+        addToStepStatus(new JLabel("Od matrice treba oduzeti dijagonalnu matricu"));
+        addToStepStatus(new JLabel("pre nego što se transformiše u Smitovu formu:"));
         addToStepStatus(getLaTexLabel("A_I = x*I-A"));
         addToStepStatus(new JComponent[]{
                 getLaTexLabel(generateLatexMatrix("I", form.getHandler().diagonal(matrix.getRowNumber(), form.getHandler().getObjectFromString(String.valueOf(Term.X))))),

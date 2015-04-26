@@ -34,7 +34,7 @@ public class RationalCanonicalStep extends AbstractStep {
                 break;
             case INFO:
                 matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
-                addToStepStatus(new JLabel("Current state of matrix [A]:"));
+                addToStepStatus(new JLabel("Trenutno stanje matrice [A]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     addFixingDiagonalExplanation();
@@ -45,36 +45,36 @@ public class RationalCanonicalStep extends AbstractStep {
                 break;
             case END:
                 matrix = handler.duplicate(rForm.getStartMatrix());
-                addToStepStatus(new JLabel("Starting matrix [A]:"));
+                addToStepStatus(new JLabel("Početna matrica [A]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 matrix = handler.duplicate(rForm.getFinalMatrix());
-                addToStepStatus(new JLabel("Transformed matrix [R]:"));
+                addToStepStatus(new JLabel("Transformisana matrica [R]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("R", matrix)));
                 matrices.add(new MatrixEntry("R", matrix));
                 matrix = handler.duplicate(rForm.getT());
-                addToStepStatus(new JLabel("Matrix [T]:"));
+                addToStepStatus(new JLabel("Matrica [T]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("T", matrix)));
                 addToStepStatus(getLaTexLabel("T^{-1}*A*T = R(A)"));
-                addToStepStatus(new JLabel("R(A): Transformation of matrix A to rational form"));
+                addToStepStatus(new JLabel("R(A): Transformacija matrice [A] u racionalnu formu"));
                 matrices.add(new MatrixEntry("T", matrix));
                 break;
             default:
                 //step
                 matrix = handler.duplicate(rForm.getP(rForm.getRound()));
-                addToStepStatus(new JLabel("Current state of matrix [P]:"));
+                addToStepStatus(new JLabel("Trenutno stanje matrice [P]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("P[" + rForm.getRound() + "]", matrix)));
                 matrices.add(new MatrixEntry("P[" + rForm.getRound() + "]", matrix));
                 matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
-                addToStepStatus(new JLabel("Current state of matrix [A]:"));
+                addToStepStatus(new JLabel("Trenutno stanje matrice [A]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 matrices.add(new MatrixEntry("A_I", matrix));
                 matrix = handler.duplicate(rForm.getQ(rForm.getRound()));
-                addToStepStatus(new JLabel("Current state of matrix [Q]:"));
+                addToStepStatus(new JLabel("Trenutno stanje matrice [Q]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("Q[" + rForm.getRound() + "]", matrix)));
                 matrices.add(new MatrixEntry("Q[" + rForm.getRound() + "]", matrix));
-                addToStepStatus(new JLabel("P: Reflects operations on rows."));
-                addToStepStatus(new JLabel("Q: Reflects operations on columns."));
+                addToStepStatus(new JLabel("P: Oslikava operacija nad redovima."));
+                addToStepStatus(new JLabel("Q: Oslikava operacija nad kolonama."));
         }
     }
 
@@ -83,13 +83,13 @@ public class RationalCanonicalStep extends AbstractStep {
         String title = "";
         switch (getNumber()) {
             case START:
-                title += "Starting transformation to Rational canonical form for matrix:";
+                title += "Početak transformacije matrice [A] u racionalnu kanonsku formu:";
                 break;
             case INFO:
                 if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Elements on diagonal need fixing.";
+                    title += "Elemente na dijagonali treba ispraviti.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Finished fixing elements on diagonal.";
+                    title += "Završetak ispravke elemenata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
                     title += "Title INFO_SUBTRACT_FOR_SMITH.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_FINISH_RATIONAL_START_T)) {
@@ -103,7 +103,7 @@ public class RationalCanonicalStep extends AbstractStep {
                 }
                 break;
             case END:
-                title += "Transformation ended.";
+                title += "Transformacija je završena.";
                 break;
             default:
                 //step

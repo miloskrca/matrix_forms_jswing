@@ -34,7 +34,7 @@ public class SmithStep extends AbstractStep {
                 break;
             case INFO:
                 matrix = handler.duplicate(sForm.getFinalMatrix());
-                addToStepStatus(new JLabel("Current state of matrix [A]:"));
+                addToStepStatus(new JLabel("Trenutno stanje matrice [A]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
                 if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     addFixingDiagonalExplanation();
@@ -43,11 +43,11 @@ public class SmithStep extends AbstractStep {
                 break;
             case END:
                 matrix = handler.duplicate(sForm.getStartMatrix());
-                addToStepStatus(new JLabel("Starting matrix [A]:"));
+                addToStepStatus(new JLabel("Početna matrica [A]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
                 matrix = handler.duplicate(sForm.getFinalMatrix());
-                addToStepStatus(new JLabel("Transformed matrix [S]:"));
+                addToStepStatus(new JLabel("Transformisana matrica [S]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("S", matrix)));
                 matrices.add(new MatrixEntry("S", matrix));
                 break;
@@ -64,13 +64,13 @@ public class SmithStep extends AbstractStep {
         String title = "";
         switch (getNumber()) {
             case START:
-                title = "Starting transformation to Smith normal form for matrix [A]:";
+                title = "Početak transformacije matrice [A] u Smitovu formu:";
                 break;
             case INFO:
                 if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Elements on diagonal need fixing.";
+                    title += "Elemente na dijagonali treba ispraviti.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Finished fixing elements on diagonal.";
+                    title += "Završetak ispravke elemenata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
                     title += "Title INFO_FIX_LEADING_COEFFICIENTS.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
@@ -80,7 +80,7 @@ public class SmithStep extends AbstractStep {
                 }
                 break;
             case END:
-                title = "Transformation ended.";
+                title = "Transformacija je završena.";
                 break;
             default:
                 //step

@@ -31,9 +31,9 @@ import java.util.Observable;
  */
 public class MatrixFormsJSwing extends JFrame implements FormObserver {
 
-    public static final String SMITH_FORM = "Smith normal form";
-    public static final String RATIONAL_FORM = "Rational canonical form";
-    public static final String JORDANS_FORM = "Jordans canonical form";
+    public static final String SMITH_FORM = "Smitova normalna forma";
+    public static final String RATIONAL_FORM = "Racionalna kanonska forma";
+    public static final String JORDANS_FORM = "Žordanova kanonska forma";
 
     ArrayList<AbstractStep> stepObjects = new ArrayList<AbstractStep>();
     private int count = 0;
@@ -54,7 +54,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private JDialog aboutDialog;
 
     public MatrixFormsJSwing(String[] args) {
-        super("Smiths, rational i Jordans form");
+        super("Smitova, racionalna i Žordanova forma");
         addMenu();
 
         btnStart.addActionListener(new ActionListener() {
@@ -92,23 +92,23 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                     paramForm = true;
                     comboFormSelect.setSelectedIndex(option);
                 } else {
-                    System.out.println("--form option out of bounds. Available from 0 to " + (comboFormSelect.getComponentCount()));
+                    System.out.println("--form opcija van granica dozvoljeno. Dozvoljeno od 0 do " + (comboFormSelect.getComponentCount()));
                 }
             } else if (param.equals("--run")) {
                 paramRun = true;
             } else {
-                System.out.println("Parameter not recognized (" + param + ")");
+                System.out.println("Parametar nije prepoznat (" + param + ")");
             }
         }
-        if(paramRun) {
-            if(paramForm && paramMatrix) {
+        if (paramRun) {
+            if (paramForm && paramMatrix) {
                 startTransformation();
             } else {
                 if (!paramForm) {
-                    System.out.println("--form option needs to be set properly to be able to run.");
+                    System.out.println("--form opcija mora biti ispravno uneta da se moglo pokrenuti izračunavanje.");
                 }
                 if (!paramMatrix) {
-                    System.out.println("--matrix option needs to be set properly to be able to run.");
+                    System.out.println("--matrix opcija mora biti ispravno uneta da se moglo pokrenuti izračunavanje.");
                 }
             }
         }
@@ -120,7 +120,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         currentlySelectedStep = -1;
 
         panelMatrixDisplay.removeAll();
-        panelMatrixDisplay.add(new JLabel("Running..."));
+        panelMatrixDisplay.add(new JLabel("Računanje..."));
         panelMatrixDisplay.revalidate();
         panelMatrixDisplay.repaint();
 
@@ -162,29 +162,29 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
             case FormEvent.PROCESSING_START:
                 step = getStep(AbstractStep.START, null, event, form);
                 stepObjects.add(step);
-                System.out.println("Start");
+//                System.out.println("Start");
                 break;
             case FormEvent.PROCESSING_STEP:
                 ICommand stepCommand = form.getCommands().size() > 0 ? form.getCommands().getLast() : null;
                 if (stepCommand != null) {
                     step = getStep(count++, stepCommand, event, form);
                     stepObjects.add(step);
-                    System.out.println(stepCommand.getDescription());
-                    System.out.println(form.getHandler().getMatrix().toString() + "\n");
+//                    System.out.println(stepCommand.getDescription());
+//                    System.out.println(form.getHandler().getMatrix().toString() + "\n");
                 }
                 break;
             case FormEvent.PROCESSING_INFO:
                 ICommand infoCommand = form.getCommands().size() > 0 ? form.getCommands().getLast() : null;
                 step = getStep(AbstractStep.INFO, infoCommand, event, form);
                 stepObjects.add(step);
-                System.out.println("Info");
-                System.out.println(form.getHandler().getMatrix().toString() + "\n");
+//                System.out.println("Info");
+//                System.out.println(form.getHandler().getMatrix().toString() + "\n");
                 break;
             case FormEvent.PROCESSING_END:
                 step = getStep(AbstractStep.END, null, event, form);
                 stepObjects.add(step);
                 listSteps.setEnabled(true);
-                System.out.println("End");
+//                System.out.println("End");
                 DefaultListModel<String> listModel = new DefaultListModel<String>();
                 for (AbstractStep aStep : stepObjects) {
                     listModel.addElement(aStep.getTitle());
@@ -261,11 +261,11 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         menuBar = new JMenuBar();
 
         // File
-        menu = new JMenu("File");
+        menu = new JMenu("Fajl");
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
 
-        menuItem = new JMenuItem("Exit");
+        menuItem = new JMenuItem("Izlaz");
         menuItem.setMnemonic(KeyEvent.VK_E);
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -276,7 +276,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         menu.add(menuItem);
 
         // Edit
-        menu = new JMenu("Examples");
+        menu = new JMenu("Primeri");
         menu.setMnemonic(KeyEvent.VK_X);
 
         // Examples
@@ -313,11 +313,11 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         menuBar.add(menu);
 
         // About
-        menu = new JMenu("Help");
+        menu = new JMenu("Pomoć");
         menu.setMnemonic(KeyEvent.VK_H);
         menuBar.add(menu);
 
-        menuItem = new JMenuItem("Get MuPad command for visible matrices");
+        menuItem = new JMenuItem("Generiši MuPad komande za dostupne matrice");
         menuItem.setMnemonic(KeyEvent.VK_M);
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -327,7 +327,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         });
         menu.add(menuItem);
 
-        menuItem = new JMenuItem("About");
+        menuItem = new JMenuItem("O programu");
         menuItem.setMnemonic(KeyEvent.VK_A);
         menuItem.addActionListener(new ActionListener() {
             @Override
@@ -352,16 +352,21 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                 AbstractStep selectedStep = stepObjects.get(selected);
 
                 if (muPadDialog == null) {
-                    muPadDialog = new JDialog(MatrixFormsJSwing.this);
+                    muPadDialog = new JDialog(MatrixFormsJSwing.this, true);
+                    muPadDialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
                     muPadDialog.setMinimumSize(new Dimension(300, 200));
                 }
 
                 try {
                     muPadDialog.getContentPane().removeAll();
-                    muPadDialog.add(new JLabel("MuPad commands for generating visible matrices" +
-                            " of the selected step (" + selectedStep.getTitle() + "):"), BorderLayout.NORTH);
+                    muPadDialog.add(new JLabel("MuPad komande za generisanje dostupnih matrica" +
+                            " izabranog koraka (" + selectedStep.getTitle() + "):"), BorderLayout.NORTH);
                     muPadDialog.add(new JTextArea(selectedStep.getMuPadCommands()), BorderLayout.CENTER);
                     muPadDialog.pack();
+                    muPadDialog.setLocation(
+                            (Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2,
+                            (Toolkit.getDefaultToolkit().getScreenSize().height) / 2 - getHeight() / 2
+                    );
                     muPadDialog.setVisible(true);
                 } catch (Exception e) {
                     showException(e);
@@ -376,38 +381,25 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
      */
     protected void showAboutDialog() {
         if (aboutDialog == null) {
-            aboutDialog = new JDialog(MatrixFormsJSwing.this);
-            aboutDialog.setTitle("About");
-            aboutDialog.setMinimumSize(new Dimension(400, 200));
+            aboutDialog = new JDialog(MatrixFormsJSwing.this, true);
+            aboutDialog.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+            aboutDialog.setResizable(false);
+            aboutDialog.setTitle("O programu");
+            aboutDialog.setSize(new Dimension(450, 150));
 
-            JPanel panel = new JPanel();
-            panel.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-            String textTitle = "Java application for Smiths, rational i Jordans form";
-            JLabel labelTitle = new JLabel(textTitle);
-            labelTitle.setHorizontalAlignment(SwingConstants.CENTER);
-            labelTitle.setVerticalAlignment(SwingConstants.TOP);
-            panel.add(labelTitle);
-
-            String textAuthor = "Author: Miloš Krsmanović";
-            JLabel labelAuthor = new JLabel(textAuthor);
-            labelAuthor.setHorizontalAlignment(SwingConstants.CENTER);
-            labelTitle.setVerticalAlignment(SwingConstants.CENTER);
-            panel.add(labelAuthor);
-
-            String textIndex = "Index: 2012/3247";
-            JLabel labelIndex = new JLabel(textIndex);
-            labelIndex.setHorizontalAlignment(SwingConstants.CENTER);
-            labelTitle.setVerticalAlignment(SwingConstants.CENTER);
-            panel.add(labelIndex);
-
-            String textInfo = "Za svrhu izrade master rada na Elektrotehničkom fakultetu u Beogradu.";
-            JLabel labelInfo = new JLabel(textInfo);
-            labelIndex.setHorizontalAlignment(SwingConstants.CENTER);
-            labelTitle.setVerticalAlignment(SwingConstants.CENTER);
-            panel.add(labelInfo);
-
-            aboutDialog.add(panel);
+            Box b = Box.createVerticalBox();
+            b.setBorder(new EmptyBorder(5, 5, 5, 5));
+            b.add(Box.createGlue());
+            b.add(new JLabel("Java aplikacija za Smitovu, racionalnu i Žordanovu formu"));
+            b.add(new JLabel("Autor: Miloš Krsmanović"));
+            b.add(new JLabel("Indeks: 2012/3247"));
+            b.add(new JLabel("Za svrhu izrade master rada na Elektrotehničkom fakultetu u Beogradu."));
+            b.add(Box.createGlue());
+            aboutDialog.getContentPane().add(b, "Center");
+            aboutDialog.setLocation(
+                    (Toolkit.getDefaultToolkit().getScreenSize().width) / 2 - getWidth() / 2,
+                    (Toolkit.getDefaultToolkit().getScreenSize().height) / 2 - getHeight() / 2
+            );
         }
         aboutDialog.setVisible(true);
     }
