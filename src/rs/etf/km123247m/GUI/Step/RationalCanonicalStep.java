@@ -1,6 +1,8 @@
 package rs.etf.km123247m.GUI.Step;
 
 import rs.etf.km123247m.Command.ICommand;
+import rs.etf.km123247m.Command.MatrixCommand.SwitchColumnsCommand;
+import rs.etf.km123247m.Command.MatrixCommand.SwitchRowsCommand;
 import rs.etf.km123247m.Matrix.Forms.Implementation.RationalCanonicalMatrixForm;
 import rs.etf.km123247m.Matrix.Forms.MatrixForm;
 import rs.etf.km123247m.Matrix.Handler.MatrixHandler;
@@ -34,11 +36,11 @@ public class RationalCanonicalStep extends AbstractStep {
                 break;
             case INFO:
                 matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
-                addToStepStatus(new JLabel("Trenutno stanje matrice [A]:"));
+                addToStepStatus(new JLabel("Trenutno stanje matrice:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
-                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     addFixingDiagonalExplanation();
-                } else if(getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
                     addSubtractForSmithExplanation(rForm.getStartMatrix());
                 }
                 matrices.add(new MatrixEntry("A_I", matrix));
@@ -61,14 +63,24 @@ public class RationalCanonicalStep extends AbstractStep {
                 break;
             default:
                 //step
+//                matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
+//                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix, getCommand())));
+//                matrices.add(new MatrixEntry("A_I", matrix));
+
+                boolean inverse = getCommand() instanceof SwitchRowsCommand
+                        || getCommand() instanceof SwitchColumnsCommand;
+
+                matrix = getCommand().getMatrixBefore();
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_1", matrix, getCommand(), false)));
+                matrices.add(new MatrixEntry("A_1", matrix));
+                matrix = getCommand().getMatrixAfter();
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_2", matrix, getCommand(), inverse)));
+                matrices.add(new MatrixEntry("A_2", matrix));
+
                 matrix = handler.duplicate(rForm.getP(rForm.getRound()));
                 addToStepStatus(new JLabel("Trenutno stanje matrice [P]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("P[" + rForm.getRound() + "]", matrix)));
                 matrices.add(new MatrixEntry("P[" + rForm.getRound() + "]", matrix));
-                matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
-                addToStepStatus(new JLabel("Trenutno stanje matrice [A]:"));
-                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
-                matrices.add(new MatrixEntry("A_I", matrix));
                 matrix = handler.duplicate(rForm.getQ(rForm.getRound()));
                 addToStepStatus(new JLabel("Trenutno stanje matrice [Q]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("Q[" + rForm.getRound() + "]", matrix)));
@@ -86,18 +98,18 @@ public class RationalCanonicalStep extends AbstractStep {
                 title += "Početak transformacije matrice [A] u racionalnu kanonsku formu:";
                 break;
             case INFO:
-                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     title += "Elemente na dijagonali treba ispraviti.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
                     title += "Završetak ispravke elemenata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
-                    title += "Title INFO_SUBTRACT_FOR_SMITH.";
+                    title += "Oduzimanje matrice [A] od jedinične, dijagonalne, matrice pomnožene sa X.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_FINISH_RATIONAL_START_T)) {
-                    title += "Title INFO_RATIONAL_FINISH_RATIONAL_START_T.";
+                    title += "Početak generisanja matrice [T] od rezultujuće matrice [R].";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Title INFO_FIX_LEADING_COEFFICIENTS.";
+                    title += "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Title INFO_END_FIX_LEADING_COEFFICIENTS.";
+                    title += "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else {
                     title += getEvent().getMessage() + ".";
                 }

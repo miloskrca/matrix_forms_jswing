@@ -1,6 +1,8 @@
 package rs.etf.km123247m.GUI.Step;
 
 import rs.etf.km123247m.Command.ICommand;
+import rs.etf.km123247m.Command.MatrixCommand.SwitchColumnsCommand;
+import rs.etf.km123247m.Command.MatrixCommand.SwitchRowsCommand;
 import rs.etf.km123247m.Matrix.Forms.Implementation.SmithMatrixForm;
 import rs.etf.km123247m.Matrix.Forms.MatrixForm;
 import rs.etf.km123247m.Matrix.Handler.MatrixHandler;
@@ -34,9 +36,9 @@ public class SmithStep extends AbstractStep {
                 break;
             case INFO:
                 matrix = handler.duplicate(sForm.getFinalMatrix());
-                addToStepStatus(new JLabel("Trenutno stanje matrice [A]:"));
+                addToStepStatus(new JLabel("Trenutno stanje matrice:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
-                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     addFixingDiagonalExplanation();
                 }
                 matrices.add(new MatrixEntry("A_I", matrix));
@@ -53,9 +55,19 @@ public class SmithStep extends AbstractStep {
                 break;
             default:
                 //step
-                matrix = handler.duplicate(sForm.getFinalMatrix());
-                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
-                matrices.add(new MatrixEntry("A_I", sForm.getHandler().duplicate(sForm.getFinalMatrix())));
+//                matrix = handler.duplicate(sForm.getFinalMatrix());
+//                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix, getCommand())));
+//                matrices.add(new MatrixEntry("A_I", sForm.getHandler().duplicate(sForm.getFinalMatrix())));
+
+                boolean inverse = getCommand() instanceof SwitchRowsCommand
+                        || getCommand() instanceof SwitchColumnsCommand;
+
+                matrix = getCommand().getMatrixBefore();
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_1", matrix, getCommand(), false)));
+                matrices.add(new MatrixEntry("A_1", matrix));
+                matrix = getCommand().getMatrixAfter();
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_2", matrix, getCommand(), inverse)));
+                matrices.add(new MatrixEntry("A_2", matrix));
         }
     }
 
@@ -67,14 +79,14 @@ public class SmithStep extends AbstractStep {
                 title = "Početak transformacije matrice [A] u Smitovu formu:";
                 break;
             case INFO:
-                if(getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
+                if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                     title += "Elemente na dijagonali treba ispraviti.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
                     title += "Završetak ispravke elemenata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Title INFO_FIX_LEADING_COEFFICIENTS.";
+                    title += "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Title INFO_END_FIX_LEADING_COEFFICIENTS.";
+                    title += "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else {
                     title += getEvent().getMessage() + ".";
                 }
