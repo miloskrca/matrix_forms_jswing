@@ -388,7 +388,7 @@ public abstract class AbstractStep {
      * @param matrix Matrix that is subtracted from xI
      */
     protected void addSubtractForSmithExplanation(IMatrix matrix) throws Exception {
-        addToStepStatus(new JLabel("Od matrice treba oduzeti dijagonalnu matricu"));
+        addToStepStatus(new JLabel("Od dijagonalne matrice treba oduzeti matricu"));
         addToStepStatus(new JLabel("pre nego što se transformiše u Smitovu formu:"));
         addToStepStatus(getLaTexLabel("A_I = x*I-A"));
         addToStepStatus(new JComponent[]{
@@ -404,7 +404,7 @@ public abstract class AbstractStep {
     }
 
     /**
-     * Adds component to the panel
+     * Adds component to the panel and stack them horizontally
      *
      * @param components Components
      */
@@ -436,6 +436,10 @@ public abstract class AbstractStep {
      */
     protected void addTitleToStepStatus(String description) {
         Font font = getTitleFont();
+        JLabel stepTitle = new JLabel(getTitle());
+        stepTitle.setFont(font);
+        addToStepStatus(stepTitle);
+
         String[] tokens = description.split(START_MARKER + "|" + END_MARKER);
         JComponent[] components = new JComponent[tokens.length];
         for (int i = 0; i < tokens.length; i++) {
@@ -463,6 +467,27 @@ public abstract class AbstractStep {
         }
 
         return font;
+    }
+
+    /**
+     * Adds before and after matrices to step status and adds the matrices to step matrices array for
+     * later usage (e.g. generate MuPad command)
+     *
+     * @throws Exception
+     */
+    protected void addBeforeAndAfterMatrices(String matrixLetter) throws Exception {
+        boolean inverse = getCommand() instanceof SwitchRowsCommand
+                || getCommand() instanceof SwitchColumnsCommand;
+
+        String beforeMatrixName = matrixLetter + "_{Ipred}";
+        String afterMatrixName = matrixLetter + "_{I}";
+
+        IMatrix matrix = getCommand().getMatrixBefore();
+        addToStepStatus(getLaTexLabel(generateLatexMatrix(beforeMatrixName, matrix, getCommand(), false)));
+        matrices.add(new MatrixEntry(beforeMatrixName, matrix));
+        matrix = getCommand().getMatrixAfter();
+        addToStepStatus(getLaTexLabel(generateLatexMatrix(afterMatrixName, matrix, getCommand(), inverse)));
+        matrices.add(new MatrixEntry(afterMatrixName, matrix));
     }
 
     public int getNumber() {

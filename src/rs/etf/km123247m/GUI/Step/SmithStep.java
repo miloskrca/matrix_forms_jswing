@@ -55,19 +55,7 @@ public class SmithStep extends AbstractStep {
                 break;
             default:
                 //step
-//                matrix = handler.duplicate(sForm.getFinalMatrix());
-//                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix, getCommand())));
-//                matrices.add(new MatrixEntry("A_I", sForm.getHandler().duplicate(sForm.getFinalMatrix())));
-
-                boolean inverse = getCommand() instanceof SwitchRowsCommand
-                        || getCommand() instanceof SwitchColumnsCommand;
-
-                matrix = getCommand().getMatrixBefore();
-                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_1", matrix, getCommand(), false)));
-                matrices.add(new MatrixEntry("A_1", matrix));
-                matrix = getCommand().getMatrixAfter();
-                addToStepStatus(getLaTexLabel(generateLatexMatrix("A_2", matrix, getCommand(), inverse)));
-                matrices.add(new MatrixEntry("A_2", matrix));
+                addBeforeAndAfterMatrices("A");
         }
     }
 
