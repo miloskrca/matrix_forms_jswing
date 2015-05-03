@@ -9,6 +9,7 @@ import rs.etf.km123247m.Observer.Event.FormEvent;
 import rs.etf.km123247m.Polynomial.Term;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -40,14 +41,12 @@ public class RationalCanonicalStep extends AbstractStep {
                     addToStepStatus(new JLabel("Matrica u racionalnoj kanonskoj formi:"));
                     addToStepStatus(getLaTexLabel(generateLatexMatrix("R", matrix)));
                     matrices.add(new MatrixEntry("R", matrix));
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_PREPARE_T)) {
-                    addSubtractForTExplanation(rForm.getFinalMatrix());
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_T)) {
-                    addGenerateTExplanation(rForm);
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_PX)) {
-                    addGeneratePxExplanation(rForm);
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_END_GENERATE_PX)) {
-                    addEndGeneratePxExplanation(rForm);
+
+                    ArrayList<IMatrix> rationalBlocks = rForm.getRationalBlocks();
+                    for (int i = 0; i < rationalBlocks.size(); i++) {
+                        addToStepStatus(getLaTexLabel(generateLatexMatrix("blok_" + i, rationalBlocks.get(i))));
+                        matrices.add(new MatrixEntry("blok_" + i, rationalBlocks.get(i)));
+                    }
                 } else {
                     matrix = handler.duplicate(rForm.getTransitionalMatrix(rForm.getRound()));
                     addToStepStatus(new JLabel("Trenutno stanje matrice:"));
@@ -56,13 +55,16 @@ public class RationalCanonicalStep extends AbstractStep {
                     matrices.add(new MatrixEntry(matrixName, matrix));
                     if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
                         addFixingDiagonalExplanation();
+                    } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
+                        if(rForm.getRound() == 0) {
+                            addToStepStatus(new JLabel("Od ove matrice generišemo matricu transformacije [R]"));
+                            addToStepStatus(new JLabel("Generišemo blokove od polinoma na dijagonali " +
+                                    "rezultujuće matrice [R]"));
+                        }
                     } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
                         addSubtractForSmithExplanation(rForm.getStartMatrix());
-                    } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
-                        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_0", rForm.getP(0))));
-                        matrices.add(new MatrixEntry("P_0", rForm.getP(0)));
-                        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_1", rForm.getP(1))));
-                        matrices.add(new MatrixEntry("P_1", rForm.getP(1)));
+                    } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_PREPARE_T)) {
+                        addSubtractForTExplanation(rForm.getFinalMatrix());
                     }
                 }
                 break;
@@ -84,18 +86,26 @@ public class RationalCanonicalStep extends AbstractStep {
                 break;
             default:
                 //step
-                addBeforeAndAfterMatrices(rForm.getRound() == 0 ? "A" : "B");
+                if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_T)) {
+                    addGenerateTExplanation(rForm);
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_PX)) {
+                    addGeneratePxExplanation(rForm);
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_END_GENERATE_PX)) {
+                    addEndGeneratePxExplanation(rForm);
+                } else {
+                    addBeforeAndAfterMatrices(rForm.getRound() == 0 ? "A" : "B");
 
-                matrix = handler.duplicate(rForm.getP(rForm.getRound()));
-                addToStepStatus(new JLabel("Trenutno stanje matrice [P]:"));
-                addToStepStatus(getLaTexLabel(generateLatexMatrix("P_" + rForm.getRound(), matrix)));
-                matrices.add(new MatrixEntry("P_" + rForm.getRound(), matrix));
-                matrix = handler.duplicate(rForm.getQ(rForm.getRound()));
-                addToStepStatus(new JLabel("Trenutno stanje matrice [Q]:"));
-                addToStepStatus(getLaTexLabel(generateLatexMatrix("Q_" + rForm.getRound(), matrix)));
-                matrices.add(new MatrixEntry("Q_" + rForm.getRound(), matrix));
-                addToStepStatus(new JLabel("P: Oslikava operacija nad redovima."));
-                addToStepStatus(new JLabel("Q: Oslikava operacija nad kolonama."));
+                    matrix = handler.duplicate(rForm.getP(rForm.getRound()));
+                    addToStepStatus(new JLabel("Trenutno stanje matrice [P]:"));
+                    addToStepStatus(getLaTexLabel(generateLatexMatrix("P_" + rForm.getRound(), matrix)));
+                    matrices.add(new MatrixEntry("P_" + rForm.getRound(), matrix));
+                    matrix = handler.duplicate(rForm.getQ(rForm.getRound()));
+                    addToStepStatus(new JLabel("Trenutno stanje matrice [Q]:"));
+                    addToStepStatus(getLaTexLabel(generateLatexMatrix("Q_" + rForm.getRound(), matrix)));
+                    matrices.add(new MatrixEntry("Q_" + rForm.getRound(), matrix));
+                    addToStepStatus(new JLabel("P: Oslikava operacija nad redovima."));
+                    addToStepStatus(new JLabel("Q: Oslikava operacija nad kolonama."));
+                }
         }
     }
 
@@ -121,27 +131,33 @@ public class RationalCanonicalStep extends AbstractStep {
     }
 
     /**
-     * @param form RationalCanonicalMatrixForm
+     * @param rForm RationalCanonicalMatrixForm
      * @throws Exception
      */
-    protected void addGenerateTExplanation(RationalCanonicalMatrixForm form) throws Exception {
+    protected void addGenerateTExplanation(RationalCanonicalMatrixForm rForm) throws Exception {
         addToStepStatus(getLaTexLabel("P(x) = P_0^{-1}*P_1"));
-        addToStepStatus(getLaTexLabel("T = A^n*P(x)_n + ... + A^3*P(x)_3 + A^2*P(x)_2 + A^1*P(x)_1 + P(x)_0"));
+        addToStepStatus(getLaTexLabel("T = A^nP(x)_n + ... + A^3P(x)_3 + A^2P(x)_2 + A^1P(x)_1 + P(x)_0"));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_0", rForm.getP(0))));
+        matrices.add(new MatrixEntry("P_0", rForm.getP(0)));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_1", rForm.getP(1))));
+        matrices.add(new MatrixEntry("P_1", rForm.getP(1)));
     }
 
     /**
-     * @param form RationalCanonicalMatrixForm
+     * @param rForm RationalCanonicalMatrixForm
      * @throws Exception
      */
-    protected void addGeneratePxExplanation(RationalCanonicalMatrixForm form) throws Exception {
-        MatrixHandler handler = form.getHandler();
+    protected void addGeneratePxExplanation(RationalCanonicalMatrixForm rForm) throws Exception {
+        MatrixHandler handler = rForm.getHandler();
         addToStepStatus(getLaTexLabel("P(x) = P_0^{-1}*P_1"));
-        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_0^{-1}", handler.invertMatrix(form.getP(0)))));
-        matrices.add(new MatrixEntry("P_0^{-1}", handler.invertMatrix(form.getP(0))));
-        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_1", form.getP(1))));
-        matrices.add(new MatrixEntry("P_1", form.getP(1)));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_0", rForm.getP(0))));
+        matrices.add(new MatrixEntry("P_0", rForm.getP(0)));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_0^{-1}", handler.invertMatrix(rForm.getP(0)))));
+        matrices.add(new MatrixEntry("P_0^(-1)", handler.invertMatrix(rForm.getP(0))));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("P_1", rForm.getP(1))));
+        matrices.add(new MatrixEntry("P_1", rForm.getP(1)));
         addToStepStatus(getLaTexLabel(generateLatexMatrix("P(x)", getEvent().getMatrix())));
-        matrices.add(new MatrixEntry("P(x)", getEvent().getMatrix()));
+        matrices.add(new MatrixEntry("Px", getEvent().getMatrix()));
     }
 
     /**
@@ -149,14 +165,17 @@ public class RationalCanonicalStep extends AbstractStep {
      * @throws Exception
      */
     protected void addEndGeneratePxExplanation(RationalCanonicalMatrixForm form) throws Exception {
-        addToStepStatus(getLaTexLabel("T = A^n*P(x)_n + ... + A^3*P(x)_3 + A^2*P(x)_2 + A^1*P(x)_1 + P(x)_0"));
         addToStepStatus(getLaTexLabel(generateLatexMatrix("P(x)", getEvent().getMatrix())));
-        matrices.add(new MatrixEntry("P(x)", getEvent().getMatrix()));
+        matrices.add(new MatrixEntry("Px", getEvent().getMatrix()));
+        String tString = "";
         HashMap<Integer, IMatrix> pMatrices = form.getpMatrices();
         for (Integer degree : pMatrices.keySet()) {
             addToStepStatus(getLaTexLabel(generateLatexMatrix("P(x)_" + degree, pMatrices.get(degree))));
-            matrices.add(new MatrixEntry("P(x)_" + degree, pMatrices.get(degree)));
+            matrices.add(new MatrixEntry("Px_" + degree, pMatrices.get(degree)));
+            tString = (" + " + (degree > 0 ? "A^" + degree : "") + "P(x)_" + degree) + tString;
         }
+        tString = tString.substring(3);
+        addToStepStatus(getLaTexLabel("T = " + tString));
         addToStepStatus(getLaTexLabel(generateLatexMatrix("A", form.getStartMatrix())));
         matrices.add(new MatrixEntry("A", form.getStartMatrix()));
         addToStepStatus(getLaTexLabel(generateLatexMatrix("T", form.getT())));
@@ -179,18 +198,12 @@ public class RationalCanonicalStep extends AbstractStep {
                     title += "Oduzimanje matrice [A] od jedinične, dijagonalne, matrice pomnožene sa X.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_FINISH)) {
                     title += "Kraj generisanja rezultujuće matrice [R].";
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_PREPARE_T)) {
-                    title += "Priprema za generisanje matrice [T].";
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_T)) {
-                    title += "Početak generisanje matrice [T].";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
                     title += "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
                     title += "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_PX)) {
-                    title += "Generisanje P(x) matrice.";
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_END_GENERATE_PX)) {
-                    title += "Generisanje svih P(x)pod  matrica.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_PREPARE_T)) {
+                    title += "Priprema za generisanje matrice [T].";
                 } else {
                     title += getEvent().getMessage() + ".";
                 }
@@ -200,9 +213,38 @@ public class RationalCanonicalStep extends AbstractStep {
                 break;
             default:
                 //step
-                title += getCommandDescription();
+                if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_T)) {
+                    title += "Početak generisanje matrice [T].";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_PX)) {
+                    title += "Generisanje P(x) matrice.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_END_GENERATE_PX)) {
+                    title += "Generisanje svih P(x) pod matrica.";
+                } else {
+                    title += getCommandDescription();
+                }
         }
 
         return title;
+    }
+
+    /**
+     * Return title with custom behaviour for Jordan form
+     *
+     * @return String
+     */
+    public String getTitle() {
+        switch (getNumber()) {
+            case START:
+                return "Početak";
+            case INFO:
+                if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_FINISH)) {
+                    return "Kraj [Racionalna]";
+                }
+                return "Info";
+            case END:
+                return "Kraj";
+            default:
+                return "Korak " + getNumber();
+        }
     }
 }

@@ -160,31 +160,25 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         AbstractStep step;
         switch (event.getType()) {
             case FormEvent.PROCESSING_START:
-                step = getStep(AbstractStep.START, null, event, form);
+                step = createStep(AbstractStep.START, null, event, form);
                 stepObjects.add(step);
-//                System.out.println("Start");
                 break;
             case FormEvent.PROCESSING_STEP:
                 ICommand stepCommand = form.getCommands().size() > 0 ? form.getCommands().getLast() : null;
                 if (stepCommand != null) {
-                    step = getStep(count++, stepCommand, event, form);
+                    step = createStep(count++, stepCommand, event, form);
                     stepObjects.add(step);
-//                    System.out.println(stepCommand.getDescription());
-//                    System.out.println(form.getHandler().getMatrix().toString() + "\n");
                 }
                 break;
             case FormEvent.PROCESSING_INFO:
                 ICommand infoCommand = form.getCommands().size() > 0 ? form.getCommands().getLast() : null;
-                step = getStep(AbstractStep.INFO, infoCommand, event, form);
+                step = createStep(getInfoNumber(event), infoCommand, event, form);
                 stepObjects.add(step);
-//                System.out.println("Info");
-//                System.out.println(form.getHandler().getMatrix().toString() + "\n");
                 break;
             case FormEvent.PROCESSING_END:
-                step = getStep(AbstractStep.END, null, event, form);
+                step = createStep(AbstractStep.END, null, event, form);
                 stepObjects.add(step);
                 listSteps.setEnabled(true);
-//                System.out.println("End");
                 DefaultListModel<String> listModel = new DefaultListModel<String>();
                 for (AbstractStep aStep : stepObjects) {
                     listModel.addElement(aStep.getTitle());
@@ -201,6 +195,31 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
                 listSteps.setEnabled(false);
                 break;
         }
+    }
+
+    /**
+     * Get Info number
+     *
+     * @param event FormEvent
+     *
+     * @return int
+     */
+    protected int getInfoNumber(FormEvent event) {
+        int number = AbstractStep.INFO;
+        String message = event.getMessage();
+        if (message.equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)
+                || message.equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)
+                || message.equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)
+//                || message.equals(FormEvent.INFO_RATIONAL_PREPARE_T)
+                || message.equals(FormEvent.INFO_RATIONAL_GENERATE_T)
+                || message.equals(FormEvent.INFO_RATIONAL_GENERATE_PX)
+                || message.equals(FormEvent.INFO_RATIONAL_END_GENERATE_PX)
+                ) {
+            number = count++;
+            // this makes this Info into a Step
+        }
+
+        return number;
     }
 
     private void stepSelected() {
@@ -227,7 +246,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         }
     }
 
-    private AbstractStep getStep(int type, ICommand command, FormEvent event, MatrixForm form) {
+    private AbstractStep createStep(int type, ICommand command, FormEvent event, MatrixForm form) {
         String selectedItem = (String) comboFormSelect.getSelectedItem();
         if (selectedItem.equals(SMITH_FORM)) {
             return new SmithStep(type, command, event, form);

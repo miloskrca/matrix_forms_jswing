@@ -42,12 +42,6 @@ public class JordanStep extends AbstractStep {
                     addFixingDiagonalExplanation();
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
                     addSubtractForSmithExplanation(jForm.getStartMatrix());
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)) {
-                    addGenerateFactorsForJordanExplanation();
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)) {
-                    addGenerateBlocksForJordanExplanation(jForm);
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)) {
-                    addEndGenerateBlocksForJordanExplanation(jForm);
                 }
                 matrices.add(new MatrixEntry("A_I", matrix));
                 break;
@@ -63,37 +57,57 @@ public class JordanStep extends AbstractStep {
                 break;
             default:
                 //step
-                addBeforeAndAfterMatrices("A");
+                if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)) {
+                    addGenerateFactorsForJordanExplanation(jForm);
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)) {
+                    addGenerateBlocksForJordanExplanation(jForm);
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)) {
+                    addEndGenerateBlocksForJordanExplanation(jForm);
+                } else {
+                    addBeforeAndAfterMatrices("A");
+                }
         }
     }
 
     /**
      * Add generate blocks explanation
+     * @param jForm JordanMatrixForm
      */
-    private void addGenerateFactorsForJordanExplanation() {
+    private void addGenerateFactorsForJordanExplanation(JordanMatrixForm jForm) throws Exception {
+        IMatrix matrix = jForm.getHandler().duplicate(jForm.getTransitionalMatrix());
+        addToStepStatus(new JLabel("Trenutno stanje matrice:"));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
         addToStepStatus(new JLabel("U matrici [A] sada se generišu faktori za sve polinoma na dijagonali."));
     }
 
     /**
      * Add explanation after generating blocks
+     *
      * @param jForm JordanMatrixForm
      */
-    private void addGenerateBlocksForJordanExplanation(JordanMatrixForm jForm) {
+    private void addGenerateBlocksForJordanExplanation(JordanMatrixForm jForm) throws Exception {
+        IMatrix matrix = jForm.getHandler().duplicate(jForm.getTransitionalMatrix());
+        addToStepStatus(new JLabel("Trenutno stanje matrice:"));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
         addToStepStatus(new JLabel("Od korena polinoma na dijagonali se generisu žordanovi blokovi."));
         addToStepStatus(new JLabel("Koreni:"));
         ArrayList<ArrayList<Object>> roots = jForm.getRoots();
         for (int i = 0; i < roots.size(); i++) {
             for (int j = 0; j < roots.get(i).size(); j++) {
-                addToStepStatus(getLaTexLabel( "x_" + (i + j) + "=" + getLatexFromMatrixElement(roots.get(i).get(j))));
+                addToStepStatus(getLaTexLabel("x_" + (i + j) + "=" + getLatexFromMatrixElement(roots.get(i).get(j))));
             }
         }
     }
 
     /**
      * Add explanation after generating blocks
+     *
      * @param jForm JordanMatrixForm
      */
     private void addEndGenerateBlocksForJordanExplanation(JordanMatrixForm jForm) throws Exception {
+        IMatrix matrix = jForm.getHandler().duplicate(jForm.getTransitionalMatrix());
+        addToStepStatus(new JLabel("Trenutno stanje matrice:"));
+        addToStepStatus(getLaTexLabel(generateLatexMatrix("A_I", matrix)));
         addToStepStatus(new JLabel("Žordanovi blokovi:"));
         ArrayList<IMatrix> jordansBlocks = jForm.getJordanBlocks();
         for (int i = 0; i < jordansBlocks.size(); i++) {
@@ -119,12 +133,6 @@ public class JordanStep extends AbstractStep {
                     title += "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
                     title += "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)) {
-                    title += "Generisanje faktora elementata na dijagonali.";
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)) {
-                    title += "Završetak generisanja faktora elementata na dijagonali.";
-                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)) {
-                    title += "Završetak generisanja žordanovih blokova.";
                 } else {
                     title += getEvent().getMessage() + ".";
                 }
@@ -134,33 +142,41 @@ public class JordanStep extends AbstractStep {
                 break;
             default:
                 //step
-                title += getCommandDescription();
+                if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)) {
+                    title += "Generisanje faktora elementata na dijagonali.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)) {
+                    title += "Završetak generisanja faktora elementata na dijagonali.";
+                } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)) {
+                    title += "Završetak generisanja žordanovih blokova.";
+                } else {
+                    title += getCommandDescription();
+                }
         }
 
         return title;
     }
 
-    /**
-     * Return title with custom behaviour for Jordan form
-     *
-     * @return String
-     */
-    public String getTitle() {
-        switch (getNumber()) {
-            case START:
-                return "Početak";
-            case INFO:
-                if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)
-                        || getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)
-                        || getEvent().getMessage().equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)
-                        ) {
-                    return "Info korak";
-                }
-                return "Info";
-            case END:
-                return "Kraj";
-            default:
-                return "Korak " + getNumber();
-        }
-    }
+//    /**
+//     * Return title with custom behaviour for Jordan form
+//     *
+//     * @return String
+//     */
+//    public String getTitle() {
+//        switch (getNumber()) {
+//            case START:
+//                return "Početak";
+//            case INFO:
+//                if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)
+//                        || getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)
+//                        || getEvent().getMessage().equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)
+//                        ) {
+//                    return "Info korak";
+//                }
+//                return "Info";
+//            case END:
+//                return "Kraj";
+//            default:
+//                return "Korak " + getNumber();
+//        }
+//    }
 }
