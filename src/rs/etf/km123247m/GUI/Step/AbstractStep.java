@@ -26,8 +26,8 @@ public abstract class AbstractStep {
     public final static int START = -1;
     public final static int INFO = -2;
     public final static int END = -3;
-    private static final String FIRST_COLOR = "White";
-    private static final String SECOND_COLOR = "GreenYellow";
+    private static final String FIRST_COLOR = "Blue";
+    private static final String SECOND_COLOR = "Red";
     private int number;
 
     public final static String START_MARKER = "###LaTexLabelStart###";
@@ -301,7 +301,7 @@ public abstract class AbstractStep {
     }
 
     protected String colorString(String string, String color) {
-        return "\\colorbox{" + color + "}{" + string + "}";
+        return "\\textcolor{" + color + "}{" + string + "}";
     }
 
     protected String colorInt(int integer, String color) {
