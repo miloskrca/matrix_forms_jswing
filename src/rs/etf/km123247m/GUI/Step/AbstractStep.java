@@ -11,6 +11,8 @@ import rs.etf.km123247m.Observer.Event.FormEvent;
 import rs.etf.km123247m.Polynomial.Term;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
@@ -329,25 +331,25 @@ public abstract class AbstractStep {
                 MultiplyRowWithElementAndStoreCommand comm = (MultiplyRowWithElementAndStoreCommand) command;
                 description = "Množenje reda "
                         + colorInt(comm.getRow(), FIRST_COLOR) + " sa "
-                        + START_MARKER + comm.getElement().toString() + END_MARKER + ".";
+                        + START_MARKER + getLatexFromMatrixElement(comm.getElement()) + END_MARKER + ".";
             } else if (commandClass.equals("MultiplyRowWithElementAndAddToRowAndStoreCommand")) {
                 MultiplyRowWithElementAndAddToRowAndStoreCommand comm =
                         (MultiplyRowWithElementAndAddToRowAndStoreCommand) command;
                 description = "Množenje reda "
                         + colorInt(comm.getRow1(), FIRST_COLOR) + " sa "
-                        + START_MARKER + comm.getElement().toString() + END_MARKER + " i dodavanje redu "
+                        + START_MARKER + getLatexFromMatrixElement(comm.getElement()) + END_MARKER + " i dodavanje redu "
                         + colorInt(comm.getRow2(), SECOND_COLOR) + ".";
             } else if (commandClass.equals("MultiplyColumnWithElementAndStoreCommand")) {
                 MultiplyColumnWithElementAndStoreCommand comm = (MultiplyColumnWithElementAndStoreCommand) command;
                 description = "Množenje kolone "
                         + colorInt(comm.getColumn(), FIRST_COLOR) + " sa "
-                        + START_MARKER + comm.getElement().toString() + END_MARKER + ".";
+                        + START_MARKER + getLatexFromMatrixElement(comm.getElement()) + END_MARKER + ".";
             } else if (commandClass.equals("MultiplyColumnWithElementAndAddToColumnAndStoreCommand")) {
                 MultiplyColumnWithElementAndAddToColumnAndStoreCommand comm =
                         (MultiplyColumnWithElementAndAddToColumnAndStoreCommand) command;
                 description = "Množenje kolone "
                         + colorInt(comm.getColumn1(), FIRST_COLOR) + " sa "
-                        + START_MARKER + comm.getElement().toString() + END_MARKER + " i dodavanje koloni "
+                        + START_MARKER + getLatexFromMatrixElement(comm.getElement()) + END_MARKER + " i dodavanje koloni "
                         + colorInt(comm.getColumn2(), SECOND_COLOR) + ".";
             } else if (commandClass.equals("AddRowsAndStoreCommand")) {
                 AddRowsAndStoreCommand comm = (AddRowsAndStoreCommand) command;
@@ -407,13 +409,38 @@ public abstract class AbstractStep {
      * Adds component to the panel and stack them horizontally
      *
      * @param components Components
+     * @param border Border
      */
-    public void addToStepStatus(JComponent[] components) {
+    public void addToStepStatus(JComponent[] components, Border border) {
         JPanel panel = new JPanel();
         for (JComponent component : components) {
             panel.add(component);
         }
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setBorder(border);
+        stepStatusPanel.add(panel);
+    }
+
+    /**
+     * Adds component to the panel and stack them horizontally
+     *
+     * @param components Components
+     */
+    public void addToStepStatus(JComponent[] components) {
+        addToStepStatus(components, null);
+    }
+
+    /**
+     * Adds component to the panel
+     *
+     * @param component Component
+     * @param border Border
+     */
+    public void addToStepStatus(JComponent component, Border border) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(component);
+        panel.setBorder(border);
         stepStatusPanel.add(panel);
     }
 
@@ -423,10 +450,7 @@ public abstract class AbstractStep {
      * @param component Component
      */
     public void addToStepStatus(JComponent component) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(component);
-        stepStatusPanel.add(panel);
+        addToStepStatus(component, null);
     }
 
     /**
@@ -453,7 +477,7 @@ public abstract class AbstractStep {
                 components[i] = getLaTexLabel(tokens[i]);
             }
         }
-        addToStepStatus(components);
+        addToStepStatus(components, new EmptyBorder(0, 0, 10, 0));
     }
 
     /**
