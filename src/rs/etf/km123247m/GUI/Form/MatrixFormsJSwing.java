@@ -178,23 +178,26 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
             case FormEvent.PROCESSING_END:
                 step = createStep(AbstractStep.END, null, event, form);
                 stepObjects.add(step);
-                listSteps.setEnabled(true);
-                DefaultListModel<String> listModel = new DefaultListModel<String>();
-                for (AbstractStep aStep : stepObjects) {
-                    listModel.addElement(aStep.getTitle());
-                }
-                listSteps.setModel(listModel);
-                listSteps.setSelectedIndex(stepObjects.size() - 1);
-                stepSelected();
-                listSteps.grabFocus();
+                addStepsToList();
                 break;
             case FormEvent.PROCESSING_EXCEPTION:
-                System.out.println(event.getMessage());
-                stepObjects.clear();
-                showException(event);
-                listSteps.setEnabled(false);
+                step = new ExceptionStep(AbstractStep.EXCEPTION, null, event, form);
+                stepObjects.add(step);
+                addStepsToList();
                 break;
         }
+    }
+
+    protected void addStepsToList() {
+        listSteps.setEnabled(true);
+        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        for (AbstractStep aStep : stepObjects) {
+            listModel.addElement(aStep.getTitle());
+        }
+        listSteps.setModel(listModel);
+        listSteps.setSelectedIndex(stepObjects.size() - 1);
+        stepSelected();
+        listSteps.grabFocus();
     }
 
     /**

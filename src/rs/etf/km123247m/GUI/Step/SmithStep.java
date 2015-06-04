@@ -61,22 +61,22 @@ public class SmithStep extends AbstractStep {
 
     @Override
     public String getDescription() {
-        String title = "";
+        String title;
         switch (getNumber()) {
             case START:
                 title = "Početak transformacije matrice [A] u Smitovu formu:";
                 break;
             case INFO:
                 if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Elemente na dijagonali treba ispraviti.";
+                    title = "Elemente na dijagonali treba ispraviti.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Završetak ispravke elemenata na dijagonali.";
+                    title = "Završetak ispravke elemenata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
+                    title = "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
+                    title = "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else {
-                    title += getEvent().getMessage() + ".";
+                    title = getEvent().getMessage() + ".";
                 }
                 break;
             case END:

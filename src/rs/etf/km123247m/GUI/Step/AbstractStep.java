@@ -28,6 +28,7 @@ public abstract class AbstractStep {
     public final static int START = -1;
     public final static int INFO = -2;
     public final static int END = -3;
+    public final static int EXCEPTION = -4;
     private static final String FIRST_COLOR = "Blue";
     private static final String SECOND_COLOR = "Red";
     private int number;

@@ -117,39 +117,39 @@ public class JordanStep extends AbstractStep {
 
     @Override
     public String getDescription() {
-        String title = "";
+        String title;
         switch (getNumber()) {
             case START:
-                title += "Početak transformacije matrice [A] u Žordanovu formu:";
+                title = "Početak transformacije matrice [A] u Žordanovu formu:";
                 break;
             case INFO:
                 if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Elemente na dijagonali treba ispraviti.";
+                    title = "Elemente na dijagonali treba ispraviti.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Završetak ispravke elemenata na dijagonali.";
+                    title = "Završetak ispravke elemenata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
-                    title += "Oduzimanje matrice [A] od jedinične, dijagonalne, matrice pomnožene sa X.";
+                    title = "Oduzimanje matrice [A] od jedinične, dijagonalne, matrice pomnožene sa X.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
+                    title = "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
+                    title = "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else {
-                    title += getEvent().getMessage() + ".";
+                    title = getEvent().getMessage() + ".";
                 }
                 break;
             case END:
-                title += "Transformacija je završena.";
+                title = "Transformacija je završena.";
                 break;
             default:
                 //step
                 if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_FACTORS)) {
-                    title += "Generisanje faktora elementata na dijagonali.";
+                    title = "Generisanje faktora elementata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_GENERATE_BLOCKS)) {
-                    title += "Završetak generisanja faktora elementata na dijagonali.";
+                    title = "Završetak generisanja faktora elementata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_JORDAN_END_GENERATE_BLOCKS)) {
-                    title += "Završetak generisanja žordanovih blokova.";
+                    title = "Završetak generisanja žordanovih blokova.";
                 } else {
-                    title += getCommandDescription();
+                    title = getCommandDescription();
                 }
         }
 

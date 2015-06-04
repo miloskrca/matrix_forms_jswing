@@ -73,16 +73,16 @@ public class RationalCanonicalStep extends AbstractStep {
                 addToStepStatus(new JLabel("Početna matrica [A]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
                 matrices.add(new MatrixEntry("A", matrix));
+                matrix = handler.duplicate(rForm.getT());
+                addToStepStatus(new JLabel("Matrica [T]:"));
+                addToStepStatus(getLaTexLabel(generateLatexMatrix("T", matrix)));
+                matrices.add(new MatrixEntry("T", matrix));
                 matrix = handler.duplicate(rForm.getFinalMatrix());
                 addToStepStatus(new JLabel("Transformisana matrica [R]:"));
                 addToStepStatus(getLaTexLabel(generateLatexMatrix("R", matrix)));
                 matrices.add(new MatrixEntry("R", matrix));
-                matrix = handler.duplicate(rForm.getT());
-                addToStepStatus(new JLabel("Matrica [T]:"));
-                addToStepStatus(getLaTexLabel(generateLatexMatrix("T", matrix)));
                 addToStepStatus(getLaTexLabel("T^{-1}*A*T = R(A)"));
                 addToStepStatus(new JLabel("R(A): Transformacija matrice [A] u racionalnu formu"));
-                matrices.add(new MatrixEntry("T", matrix));
                 break;
             default:
                 //step
@@ -184,43 +184,43 @@ public class RationalCanonicalStep extends AbstractStep {
 
     @Override
     public String getDescription() {
-        String title = "";
+        String title;
         switch (getNumber()) {
             case START:
-                title += "Početak transformacije matrice [A] u racionalnu kanonsku formu:";
+                title = "Početak transformacije matrice [A] u racionalnu kanonsku formu:";
                 break;
             case INFO:
                 if (getEvent().getMessage().equals(FormEvent.INFO_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Elemente na dijagonali treba ispraviti.";
+                    title = "Elemente na dijagonali treba ispraviti.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_ELEMENTS_ON_DIAGONAL)) {
-                    title += "Završetak ispravke elemenata na dijagonali.";
+                    title = "Završetak ispravke elemenata na dijagonali.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_SUBTRACT_FOR_SMITH)) {
-                    title += "Oduzimanje matrice [A] od jedinične, dijagonalne, matrice pomnožene sa X.";
+                    title = "Oduzimanje matrice [A] od jedinične, dijagonalne, matrice pomnožene sa X.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_FINISH)) {
-                    title += "Kraj generisanja rezultujuće matrice [R].";
+                    title = "Kraj generisanja rezultujuće matrice [R].";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
+                    title = "Redukcija koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_END_FIX_LEADING_COEFFICIENTS)) {
-                    title += "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
+                    title = "Kraj redukcije koeficijenata uz elemente sa najvećim stepenom na 1.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_PREPARE_T)) {
-                    title += "Priprema za generisanje matrice [T].";
+                    title = "Priprema za generisanje matrice [T].";
                 } else {
-                    title += getEvent().getMessage() + ".";
+                    title = getEvent().getMessage() + ".";
                 }
                 break;
             case END:
-                title += "Transformacija je završena.";
+                title = "Transformacija je završena.";
                 break;
             default:
                 //step
                 if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_T)) {
-                    title += "Početak generisanje matrice [T].";
+                    title = "Početak generisanje matrice [T].";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_GENERATE_PX)) {
-                    title += "Generisanje P(x) matrice.";
+                    title = "Generisanje P(x) matrice.";
                 } else if (getEvent().getMessage().equals(FormEvent.INFO_RATIONAL_END_GENERATE_PX)) {
-                    title += "Generisanje svih P(x) pod matrica.";
+                    title = "Generisanje svih P(x) pod matrica.";
                 } else {
-                    title += getCommandDescription();
+                    title = getCommandDescription();
                 }
         }
 
