@@ -43,8 +43,9 @@ public class ExceptionStep extends AbstractStep {
      * MatrixNotNumericalExplanation
      */
     protected void addMatrixNotNumericalExplanation() {
-        addToStepStatus(new JLabel("Svi elementni matrice moraju biti numeri?kog tipa."));
+        addToStepStatus(new JLabel("Svi elementni matrice moraju biti numerickog tipa."));
         addToStepStatus(new JLabel("Simboli nisu dozvoljeni."));
+        addToStepStatus(new JLabel("Samo su celi brojevi dozvoljeni."));
     }
 
     @Override
@@ -53,7 +54,7 @@ public class ExceptionStep extends AbstractStep {
         if(getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_IS_SINGULAR)) {
             description = "Matrica je singularna!";
         } else if (getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_NOT_NUMERICAL)) {
-            description = "Matrica mora biti numeri?ka!";
+            description = "Matrica mora biti numericka!";
         } else {
             description = "Neo?ekivani izuzetak se dogodio!";
         }
