@@ -120,7 +120,13 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         currentlySelectedStep = -1;
 
         panelMatrixDisplay.removeAll();
-        panelMatrixDisplay.add(new JLabel("Računanje..."));
+        panelMatrixDisplay.setLayout(new BoxLayout(panelMatrixDisplay, BoxLayout.Y_AXIS));
+
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Računanje..."));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panelMatrixDisplay.add(panel);
+
         panelMatrixDisplay.revalidate();
         panelMatrixDisplay.repaint();
 
@@ -270,7 +276,22 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private void showException(Object exception) {
         panelMatrixDisplay.removeAll();
         if (exception instanceof Exception) {
-            panelMatrixDisplay.add(new JLabel("Exception: " + ((Exception) exception).getMessage()));
+            if(((Exception) exception).getMessage().equals("Matrix format error! m != n")) {
+                stepObjects.clear();
+                addStepsToList();
+
+                JPanel panel = new JPanel();
+                panel.add(new JLabel("Ulazna matrica je neispravna."));
+                panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+                panelMatrixDisplay.add(panel);
+
+                JPanel panel2 = new JPanel();
+                panel2.add(new JLabel("Broj vrsta mora da bude isti kao broj kolona."));
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+                panelMatrixDisplay.add(panel2);
+            } else {
+                panelMatrixDisplay.add(new JLabel("Exception: " + ((Exception) exception).getMessage()));
+            }
         } else if (exception instanceof FormEvent) {
             panelMatrixDisplay.add(new JLabel("Exception: " + ((FormEvent) exception).getMessage()));
         }
