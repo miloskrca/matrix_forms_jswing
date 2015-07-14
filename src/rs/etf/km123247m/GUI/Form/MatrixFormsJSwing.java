@@ -323,32 +323,104 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         menu.setMnemonic(KeyEvent.VK_X);
 
         // Examples
+        // Smith
+        JPanel labelPanel = new JPanel();
+        labelPanel.add(new JLabel("Smitova normalna forma"));
+        menu.addSeparator();
+        menu.add(labelPanel);
+        menu.addSeparator();
+
         menuItem = new JMenuItem("2x2");
-        menuItem.setMnemonic(KeyEvent.VK_2);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textMatrixInlineInput.setText(MatrixExamples.TWOxTWO);
+                textMatrixInlineInput.setText(MatrixExamples.SMITH_TWOxTWO);
             }
         });
         menu.add(menuItem);
 
         menuItem = new JMenuItem("3x3");
-        menuItem.setMnemonic(KeyEvent.VK_3);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textMatrixInlineInput.setText(MatrixExamples.THREExTHREE);
+                textMatrixInlineInput.setText(MatrixExamples.SMITH_THREExTHREE);
             }
         });
         menu.add(menuItem);
 
         menuItem = new JMenuItem("4x4");
-        menuItem.setMnemonic(KeyEvent.VK_4);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textMatrixInlineInput.setText(MatrixExamples.FOURxFOUR);
+                textMatrixInlineInput.setText(MatrixExamples.SMITH_FOURxFOUR);
+            }
+        });
+        menu.add(menuItem);
+
+        // Rational
+        labelPanel = new JPanel();
+        labelPanel.add(new JLabel("Racionalna kanonska forma"));
+        menu.addSeparator();
+        menu.add(labelPanel);
+        menu.addSeparator();
+
+        menuItem = new JMenuItem("2x2");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.RATIONAL_TWOxTWO);
+            }
+        });
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("3x3");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.RATIONAL_THREExTHREE);
+            }
+        });
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("4x4");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.RATIONAL_FOURxFOUR);
+            }
+        });
+        menu.add(menuItem);
+
+        // Jordans
+        labelPanel = new JPanel();
+        labelPanel.add(new JLabel("Žordanova kanonska forma"));
+        menu.addSeparator();
+        menu.add(labelPanel);
+        menu.addSeparator();
+
+        menuItem = new JMenuItem("2x2");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.JORDAN_TWOxTWO);
+            }
+        });
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("3x3");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.JORDAN_THREExTHREE);
+            }
+        });
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("4x4");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textMatrixInlineInput.setText(MatrixExamples.JORDAN_FOURxFOUR);
             }
         });
         menu.add(menuItem);
@@ -420,7 +492,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     }
 
     /**
-     * About dialog. TODO: make it better! Use labels! Maybe add logo!
+     * About dialog.
      */
     protected void showAboutDialog() {
         if (aboutDialog == null) {
