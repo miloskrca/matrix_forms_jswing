@@ -22,8 +22,8 @@ public abstract class MatrixExamples {
                     "7, 0, 0, 7x-1;";
 
     public static final String RATIONAL_TWOxTWO =
-            "1, 2;\n" +
-                    "3, 4;";
+            "3, 2;\n" +
+                    "1, 7;";
     public static final String RATIONAL_THREExTHREE =
             "2, -2, 14;\n" +
                     "0, 3, -7;\n" +
