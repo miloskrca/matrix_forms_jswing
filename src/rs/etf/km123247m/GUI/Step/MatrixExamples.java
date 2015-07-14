@@ -10,7 +10,7 @@ public abstract class MatrixExamples {
 
     public static final String SMITH_TWOxTWO =
             "x, 3;\n" +
-                    "3*x+3, 1+x;";
+                    "3x+3, 1+x;";
     public static final String SMITH_THREExTHREE =
             "0, 2, 5;\n" +
                     "3, 0, 8;\n" +
