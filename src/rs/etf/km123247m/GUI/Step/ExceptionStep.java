@@ -8,7 +8,7 @@ import rs.etf.km123247m.Observer.Event.FormEvent;
 import javax.swing.*;
 
 /**
- * Created by Milo� Krsmanovi?.
+ * Created by Miloš Krsmanović.
  * Jun 2015
  * <p/>
  * package: rs.etf.km123247m.GUI.Step
@@ -43,7 +43,7 @@ public class ExceptionStep extends AbstractStep {
      * MatrixNotNumericalExplanation
      */
     protected void addMatrixNotNumericalExplanation() {
-        addToStepStatus(new JLabel("Svi elementni matrice moraju biti numerickog tipa."));
+        addToStepStatus(new JLabel("Svi elementni matrice moraju biti numeričkog tipa."));
         addToStepStatus(new JLabel("Simboli nisu dozvoljeni."));
         addToStepStatus(new JLabel("Samo su celi brojevi dozvoljeni."));
     }
@@ -54,9 +54,9 @@ public class ExceptionStep extends AbstractStep {
         if(getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_IS_SINGULAR)) {
             description = "Matrica je singularna!";
         } else if (getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_NOT_NUMERICAL)) {
-            description = "Matrica mora biti numericka!";
+            description = "Matrica mora biti numerička!";
         } else {
-            description = "Neo?ekivani izuzetak se dogodio!";
+            description = "Neočekivani izuzetak se dogodio!";
         }
 
         return description;

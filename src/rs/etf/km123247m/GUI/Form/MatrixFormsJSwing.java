@@ -276,27 +276,43 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private void showException(Object exception) {
         panelMatrixDisplay.removeAll();
         if (exception instanceof Exception) {
-            if(((Exception) exception).getMessage().equals("Matrix format error! m != n")) {
-                stepObjects.clear();
-                addStepsToList();
-
-                JPanel panel = new JPanel();
-                panel.add(new JLabel("Ulazna matrica je neispravna."));
-                panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-                panelMatrixDisplay.add(panel);
-
-                JPanel panel2 = new JPanel();
-                panel2.add(new JLabel("Broj vrsta mora da bude isti kao broj kolona."));
-                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-                panelMatrixDisplay.add(panel2);
-            } else {
-                panelMatrixDisplay.add(new JLabel("Exception: " + ((Exception) exception).getMessage()));
-            }
+            handleParserExceptions((Exception)exception);
         } else if (exception instanceof FormEvent) {
             panelMatrixDisplay.add(new JLabel("Exception: " + ((FormEvent) exception).getMessage()));
         }
         panelMatrixDisplay.revalidate();
         panelMatrixDisplay.repaint();
+    }
+
+    /**
+     * Handle exceptions coming from parser, these are not the same as exceptions coming from forms.
+     * @param exception Exception
+     */
+    public void handleParserExceptions(Exception exception) {
+        stepObjects.clear();
+        addStepsToList();
+
+        JLabel title = new JLabel("Ulazna matrica je neispravna.");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        JPanel panel = new JPanel();
+        panel.add(title);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panelMatrixDisplay.add(panel);
+
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+        if(exception.getMessage().equals("Matrix format error! m != n")) {
+            panel.add(new JLabel("Broj vrsta mora da bude isti kao broj kolona."));
+        } else if (exception.getMessage().contains("Matrix too small.")) {
+            panel.add(new JLabel("Veličina matrice je ispod konfigurisane minimalne veličine."));
+        } else if (exception.getMessage().contains("Matrix too big.")) {
+            panel.add(new JLabel("Veličina matrice je iznad konfigurisane maksimalne veličine."));
+        } else {
+            panel.add(new JLabel("Exception: " + (exception).getMessage()));
+        }
+
+        panelMatrixDisplay.add(panel);
     }
 
     protected void addMenu() {
