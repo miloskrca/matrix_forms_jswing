@@ -25,11 +25,20 @@ public class ExceptionStep extends AbstractStep {
             addMatrixIsSingularExplanation();
         } else if (getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_NOT_NUMERICAL)) {
             addMatrixNotNumericalExplanation();
+        } else if (getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_CONTAINS_DECIMAL)) {
+            addMatrixContainsDecimalExplanation();
         }
         IMatrix matrix = getForm().getHandler().duplicate(getForm().getHandler().getMatrix());
         addToStepStatus(getLaTexLabel(generateLatexMatrix("A", matrix)));
         matrices.add(new MatrixEntry("A", matrix));
 
+    }
+
+    /**
+     * MatrixContainsDecimalExplanation
+     */
+    private void addMatrixContainsDecimalExplanation() {
+        addToStepStatus(new JLabel("Dozvoljeni su celi brojevi i razlomci."));
     }
 
     /**
@@ -55,6 +64,8 @@ public class ExceptionStep extends AbstractStep {
             description = "Matrica je singularna!";
         } else if (getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_NOT_NUMERICAL)) {
             description = "Matrica mora biti numerička!";
+        } else if (getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_CONTAINS_DECIMAL)) {
+            description = "Matrica ne sme sadržati decimalne brojeve!";
         } else {
             description = "Neočekivani izuzetak se dogodio!";
         }
@@ -65,7 +76,8 @@ public class ExceptionStep extends AbstractStep {
         public String getTitle() {
             String title;
             if(getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_IS_SINGULAR)
-                    || getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_NOT_NUMERICAL)) {
+                    || getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_NOT_NUMERICAL)
+                    || getEvent().getMessage().equals(FormEvent.EXCEPTION_MATRIX_CONTAINS_DECIMAL)) {
                 title = "Ulazna matrica nije validna.";
             } else {
                 title = "Izuzetak!";

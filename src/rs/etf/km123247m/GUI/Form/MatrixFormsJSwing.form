@@ -126,7 +126,7 @@
                   <component id="47261" class="javax.swing.JLabel">
                     <constraints border-constraint="Center"/>
                     <properties>
-                      <text value="&lt;html&gt;&lt;h1&gt;Smitova, racionalna i Zordanova forma.&lt;/h1&gt;&lt;/html&gt;"/>
+                      <text value="&lt;html&gt;&lt;h1&gt;Smitova, racionalna i Žordanova forma.&lt;/h1&gt;&lt;/html&gt;"/>
                     </properties>
                   </component>
                 </children>
