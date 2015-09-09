@@ -20,6 +20,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Observable;
 
@@ -276,7 +277,7 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
     private void showException(Object exception) {
         panelMatrixDisplay.removeAll();
         if (exception instanceof Exception) {
-            handleParserExceptions((Exception)exception);
+            handleParserExceptions((Exception) exception);
         } else if (exception instanceof FormEvent) {
             panelMatrixDisplay.add(new JLabel("Exception: " + ((FormEvent) exception).getMessage()));
         }
@@ -323,6 +324,53 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         menu = new JMenu("Fajl");
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
+
+        menuItem = new JMenuItem("Učitaj matricu iz fajla");
+        menuItem.setMnemonic(KeyEvent.VK_E);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //Create a file chooser
+                final JFileChooser fc = new JFileChooser();
+
+                //In response to a button click:
+                int returnVal = fc.showOpenDialog(MatrixFormsJSwing.this);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+
+                    try {
+                        textMatrixInlineInput.read(new FileReader(file), file.getName());
+                    } catch (FileNotFoundException e1) {
+                        showException(e1);
+                    } catch (IOException e1) {
+                        showException(e1);
+                    }
+                }
+            }
+        });
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Sačuvaj matricu u fajl");
+        menuItem.setMnemonic(KeyEvent.VK_E);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                int returnVal = chooser.showSaveDialog(null);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        String extension = getFileExtension(chooser.getSelectedFile()).equals("txt") ? "" : ".txt";
+                        FileWriter fw = new FileWriter(chooser.getSelectedFile() + extension);
+                        fw.write(textMatrixInlineInput.getText());
+                        fw.close();
+                    } catch (Exception ex) {
+                        showException(ex);
+                    }
+                }
+            }
+        });
+        menu.add(menuItem);
 
         menuItem = new JMenuItem("Izlaz");
         menuItem.setMnemonic(KeyEvent.VK_E);
@@ -469,6 +517,17 @@ public class MatrixFormsJSwing extends JFrame implements FormObserver {
         menu.add(menuItem);
 
         this.setJMenuBar(menuBar);
+    }
+
+    /**
+     * @param file File
+     * @return String
+     */
+    private String getFileExtension(File file) {
+        String fileName = file.getName();
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+            return fileName.substring(fileName.lastIndexOf(".")+1);
+        else return "";
     }
 
     /**
